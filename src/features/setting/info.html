@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>个人信息</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, "Segoe UI", sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .card {
+      background: #ffffff;
+      padding: 20px 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 350px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .card h2 {
+      margin-bottom: 15px;
+      font-size: 20px;
+      color: #333;
+    }
+
+    label {
+      font-size: 14px;
+      display: block;
+      margin-top: 12px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 6px 10px;
+      font-size: 14px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    #saveBtn {
+      margin-top: 20px;
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    #saveBtn:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>主人的信息</h2>
+    <label>姓名</label>
+    <input type="text" id="owner-name">
+
+    <label>性别</label>
+    <select id="owner-gender">
+      <option value="">请选择</option>
+      <option value="男">男</option>
+      <option value="女">女</option>
+    </select>
+
+    <label>生日</label>
+    <input type="date" id="owner-birthday">
+
+    <h2 style="margin-top:30px;">宠物信息</h2>
+    <label>名字</label>
+    <input type="text" id="pet-name">
+
+    <label>生日</label>
+    <input type="date" id="pet-birthday">
+
+    <label>星座</label>
+    <input type="text" id="pet-zodiac" readonly>
+
+    <button id="saveBtn">保存</button>
+  </div>
+
+  <script src="info.js"></script>
+</body>
+</html>
+
+

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>笔记</title>
+    <style>
+        /* 统一字体 */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 顶部工具栏 */
+        .toolbar {
+            width: 100%;
+            max-width: 350px;
+            background: rgb(248,248,248);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid #ddd;
+            border-radius: 10px 10px 0 0;
+            margin-top: 20px;
+        }
+        .close-btn {
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            cursor: pointer;
+            -webkit-app-region: no-drag; /* 保证点击有效 */
+        }
+
+.close-btn:hover {
+    color: red;
+}
+        /* 标题 */
+        .toolbar span {
+            font-weight: bold;
+            font-size: 18px;
+            color: #333;
+        }
+
+        /* 导出按钮 */
+        .export-container {
+            position: relative;
+        }
+
+        .export-btn {
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 14px;
+        }
+
+        /* 按钮悬浮效果 */
+        .export-btn:hover {
+            background: #d6d6d6;
+        }
+
+        /* 下拉菜单 */
+        .dropdown {
+            position: absolute;
+            top: 40px;
+            right: 0;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            display: none;
+            flex-direction: column;
+            min-width: 120px;
+        }
+
+        /* 菜单项 */
+        .dropdown button {
+            background: none;
+            border: none;
+            padding: 8px 12px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 14px;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        /* 悬浮时变灰 */
+        .dropdown button:hover {
+            background: #f0f0f0;
+        }
+
+        /* 主要笔记框 */
+        .note-container {
+            width: 100%;
+            max-width: 350px;
+            background: rgb(248,248,248);
+            padding: 15px;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* 文本框 */
+        textarea {
+            width: 100%;
+            height: 70vh;
+            font-size: 16px;
+            border: none;
+            outline: none;
+            resize: none;
+            background: transparent;
+            padding: 10px;
+            box-sizing: border-box;
+            line-height: 1.5;
+            overflow-y: auto;
+            scrollbar-width: thin; /* 兼容 Firefox */
+            scrollbar-color: #cccccc transparent; /* 滚动条颜色 */
+        }
+
+        /* 滚动条样式（适用于 Webkit 内核浏览器，如 Chrome、Edge） */
+        textarea::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        textarea::-webkit-scrollbar-thumb {
+            background: #cccccc;
+            border-radius: 4px;
+        }
+
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: #aaaaaa;
+        }
+
+        textarea::-webkit-scrollbar-track {
+            background: transparent;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部工具栏 -->
+    <div class="toolbar">
+<!-- 子窗口HTML顶部 -->
+        <div class="window-header">
+            <span>📝 我的笔记</span>
+            <button class="close-btn">❌</button>
+        </div>
+        <div class="export-container">
+            <button class="export-btn">📂 导出 ▼</button>
+            <div class="dropdown">
+                <button id="exportTxt">📄 导出 TXT</button>
+                <button id="exportMd">📄 导出 MD</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 笔记区域 -->
+    <div class="note-container">
+        <textarea id="note-area" placeholder="写点什么吧..."></textarea>
+    </div>
+    <script src="note.js"></script>
+</body>
+</html>
+

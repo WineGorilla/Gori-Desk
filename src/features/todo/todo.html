@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>待办事项</title>
+    <style>
+        * {
+          box-sizing: border-box;
+        }
+    
+        body {
+          font-family: "Segoe UI", sans-serif;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          margin: 0;
+          font-size: 12;
+        }
+    
+        .frame {
+          width: 360px;
+          height: 200px;
+          padding: 20px;
+          background: white;
+          color: black;
+          border-radius: 15px;
+          backdrop-filter: blur(10px);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+        }
+    
+        .task-list {
+          flex-grow: 1;
+          overflow-y: auto;
+          padding: 0 10px;
+          list-style: none;
+          margin: 0;
+        }
+    
+        .task-list li {
+          display: flex;
+          font-size: 12px;
+          align-items: center;
+          padding: 6px 0;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+          color: black;
+          transition: background-color 0.2s ease;
+        }
+    
+        .task-list li:hover {
+          background-color: rgba(255, 255, 255, 0.08);
+          border-radius: 6px;
+        }
+    
+        .circle {
+          width: 14px;
+          height: 14px;
+          border-radius: 50%;
+          border: 2px solid #ccc;
+          margin-right: 10px;
+          cursor: pointer;
+          flex-shrink: 0;
+          transition: all 0.2s ease;
+        }
+    
+        .circle.checked {
+          background-color: orange;
+        }
+    
+        .circle:hover {
+          border-color: #ccc;
+        }
+    
+        .footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: 12px;
+        }
+    
+        .header {
+          font-size: 20px;
+          font-weight: bold;
+          color: orange;
+        }
+    
+        .add {
+          width: 32px;
+          height: 32px;
+          background-color: orange;
+          color: white;
+          font-weight: bold;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          font-size: 22px;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+          transition: transform 0.2s ease;
+        }
+    
+        .add:hover {
+          background-color: #f0f0f0;
+        }
+    
+        input {
+          border: none;
+          background: transparent;
+          color: black;
+          width: 100%;
+          font-size: 16px;
+          padding: 5px;
+          outline: none;
+          transition: all 0.3s ease-in-out;
+        }
+    
+        ::placeholder {
+          color: rgba(255, 255, 255, 0.7);
+        }
+
+        .task-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.task-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.task-list::-webkit-scrollbar-thumb {
+  background-color: rgba(218, 217, 217, 0.774);
+  border-radius: 4px;
+}
+
+.close-btn {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #888;
+  cursor: pointer;
+  z-index: 10;
+  transition: color 0.2s ease;
+}
+
+.close-btn:hover {
+  color: red;
+}
+
+
+      </style>
+</head>
+<body>
+    <div class="frame">
+      <div class="close-btn" onclick="window.myAPI?.closeWindow()">×</div>
+        <ul class="task-list">
+            <li><span class="circle"></span> 蒜蓉大猩猩</li>
+            <li><span class="circle"></span> 认真学习</li>
+        </ul>
+        <div class="footer">
+            <div class="header">清单</div>
+            <div class="add" onclick="addTask()">+</div>
+        </div>
+    </div>
+<script src="todo.js">
+</script>
+</body>
+</html>

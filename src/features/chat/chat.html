@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>聊天窗口 - Copilot 风格</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Consolas, Monaco, monospace;
+      color: #24292f;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+      background: #f6f8fa;
+      border: 1px solid #d0d7de;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 16px;
+    }
+
+    h4 {
+      margin-top: 0px;
+      margin-bottom: 1px;
+      color: #0969da;
+    }
+
+    hr {
+    border: none;
+    height: 1px;
+    background-color: rgba(2, 2, 2, 0.075);
+    margin: 16px 0;
+    border-radius: 1px;
+}
+
+
+    #chat-box {
+      background-color: #f6f8fa;
+      border: none;
+      padding: 10px;
+      height: 300px;
+      overflow-y: auto;
+      border-radius: 6px;
+      font-family: Consolas, monospace;
+      font-size: 14px;
+      margin-bottom: 10px;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+      word-break: break-all;
+
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    #chat-box::-webkit-scrollbar {
+      display: none;
+    }
+
+    #chat-box p {
+        margin: 6px 0;
+        word-wrap: break-word;
+        word-break: break-all;
+        white-space: pre-wrap;
+        overflow-wrap: break-word;
+    }
+
+    .input-row {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #d0d7de;
+        border-radius: 6px;
+        padding: 6px;
+        background-color: white;
+    }
+
+    #message {
+        width: 90%;
+        font-family: Consolas, monospace;
+        resize: none;
+        overflow-y: auto;
+        border: none;
+        outline: none;
+        background-color: transparent;
+        padding: 8px;
+        line-height: 1.4;
+        font-size: 14px;
+        min-height: 50px;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .functionBox {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 6px;
+    }
+
+
+    button {
+        padding: 6px 10px;
+        background-color: #0969da;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #055fb5;
+    }
+
+    .input-row:focus-within {
+        border: 1px solid #0969da;
+        background-color: white;
+        box-shadow: 0 0 0 2px rgba(9,105,218,0.2);
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h4>💬GoriDesk</h4>
+    <hr>
+    <div id="chat-box"></div>
+    <div class="input-row">
+      <textarea id="message" placeholder="输入消息..." rows="2"></textarea>
+      <div class="functionBox">
+        <button>图片</button>
+        <button onclick="sendMessage()">发送</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+// renderer.js
+async function sendMessage() {
+    const chatBox = document.getElementById('chat-box');
+    const messageInput = document.getElementById('message');
+    const userText = messageInput.value.trim();
+    if (!userText) return;
+
+    // 用户消息
+    const userMsg = document.createElement('p');
+    userMsg.textContent = `> ${userText}`;
+    chatBox.appendChild(userMsg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+    messageInput.value = "";
+
+    // AI 回复
+    const aiReply = await window.chatAI.sendMessage(userText);
+    const aiMsg = document.createElement('p');
+    aiMsg.textContent = aiReply;
+    chatBox.appendChild(aiMsg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+  </script>
+</body>
+</html>
+
+
+
+

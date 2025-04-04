@@ -1,0 +1,50 @@
+/* 让电池放在 img 右下角 */
+.pet-energy-container {
+    position: absolute;
+    bottom: 38px;  /* 靠近底部 */
+    right: 32px;  /* 靠近右侧 */
+    width: 16px; /* 控制电池大小 */
+    text-align: center;
+    font-size: 8px;
+    color: black;
+    padding: 5px;
+    border-radius: 8px;
+}
+
+/* 电池样式 */
+.battery {
+    width: 8px;
+    height: 16px;
+    border: 2px solid black;
+    border-radius: 5px;
+    position: relative;
+    background: white;
+    overflow: hidden;
+    margin: 5px auto;
+    z-index: 20;
+}
+
+/* 电池顶部的充电头 */
+.battery::after {
+    content: "";
+    width: 12px;
+    height: 6px;
+    background: black;
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 2px;
+}
+
+/* 电池填充部分 */
+.battery-level {
+    width: 100%;
+    height: 100%;
+    background: lightgreen;
+    position: absolute;
+    bottom: 0;
+    transition: height 0.5s ease-in-out;
+    min-height: 5px;
+}
+

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../components/battery/battery.css">
+    <title>Electron 应用</title>
+    <style>
+.pet {
+    margin-top: 30px;
+    position: relative;
+    display: inline-block;
+    -webkit-app-region: drag; /* ✅ 整体默认可拖动 */
+}
+
+.speech-bubble {
+    position: absolute;
+    left: 42%;
+    top: -18%;
+    transform: translateX(-50%);
+    width: 150px;
+    background: rgba(255, 255, 255, 0.7); /* 半透明白色 */
+    backdrop-filter: blur(6px);           /* 毛玻璃模糊背景 */
+    -webkit-backdrop-filter: blur(6px);
+    padding: 10px 16px;
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    line-height: 1.5;
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.3s ease;
+}
+
+/* 三角箭头 - 更柔和 */
+.speech-bubble::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 8px;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.7) transparent transparent transparent;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.05));
+}
+
+.petImageContainer {
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.petImage {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  z-index: 1;
+}
+
+.petImage.gif-size {
+    width: 120px;
+    height: auto;
+}
+
+/* 圆点父容器 */
+.functions {
+    position: absolute;
+    left: 80%; /* 让圆点靠右 */
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    opacity: 0; /* 初始隐藏 */
+    transition: opacity 0.3s ease;
+    z-index: 10;
+}
+
+.functions.hidden {
+    opacity: 0 !important;
+    pointer-events: none !important; /* 强制隐藏且不可交互 */
+}
+
+/* 小圆点样式 */
+.functions div {
+    width: 30px;
+    height: 30px;
+    background-color: grey;
+    border-radius: 50%;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+}
+
+.pet-energy-container {
+    -webkit-app-region: no-drag; /* ✅ 可点击（电池不误触） */
+}
+
+/* 悬停时显示 */
+.pet:hover > .functions {
+    opacity: 1;
+    pointer-events: auto; /* 悬停时可交互 */
+}
+
+/*控制右键菜单*/
+.context-menu{
+    position:absolute;
+    z-index:9999;
+    width:80px;
+    background:white;
+    border:1px solid #ccc;
+    border-radius: 8px;
+    padding: 2px 0;
+    list-style:none;
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    top: 60px;
+    left:120px;
+    font-size: 11px;
+    display:none;
+    -webkit-app-region: no-drag; /* ✅ 可点击（电池不误触） */
+}
+
+.context-menu li {
+  padding: 8px 8px;
+  cursor: pointer;
+}
+
+.context-menu li:hover {
+  background-color: #f0f0f0;
+}
+
+
+
+</style>
+</head>
+<body>
+    <div class="pet">
+        <div class="speech-bubble" id="speech-bubble">你好啊主人</div>
+        <div class="petImageContainer">
+            <img class="petImage" src="../assets/Monkey.png">
+        </div>
+        <!-- 电池放在图片内部 -->
+        <div class="pet-energy-container">
+            <p><span id="pet-energy">100</span></p>
+            <div class="battery">
+                <div class="battery-level" id="battery-level"></div>
+            </div>
+        </div>
+        <div class="functions">
+            <div class="chat"></div>
+            <div class="record"></div>
+            <div class="eat"></div>
+            <div class="note"></div>
+        </div>
+        <ul id="custom-menu" class="context-menu">
+            <li id="menu-info">👤个人信息</li>
+            <li id="menu-setting">⚙️设置</li>
+            <hr>
+            <li id="menu-exit">❌退出</li>
+        </ul>
+    </div>
+    <script src="./renderer.js"></script>
+    <script src="../components/battery/battery.js"></script>
+    <script src="./menu.js"></script>
+    <script src="../features/talk/talk.js"></script>
+</body>
+</html>
+

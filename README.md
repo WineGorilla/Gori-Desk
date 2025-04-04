@@ -4,6 +4,8 @@
 It features energy tracking, feeding animations, draggable states, and popup windows like todo, note, and chat.  
 It also supports **offline AI chat** via local models such as RWKV or Ollama.
 
+![gorilla-desktop](./screenshots/adver.png)
+
 ---
 
 ## ✨ Features
@@ -33,7 +35,25 @@ src/
 ```
 
 - 🔗 [Download Ollama Executable](https://ollama.com/)
-- 🔗 [Get RWKV / Ollama Models](https://huggingface.co/) *(use your model link)*
+
+> ✅ After installing Ollama, use `ollama run` to download your desired model  
+> (e.g. `ollama run llama3`).  
+> Then, manually locate the downloaded model folder:
+
+```
+Windows: C:\Users\<YourName>\.ollama\models
+macOS/Linux: ~/.ollama/models
+```
+
+> Copy the entire model folder into:  
+> `src/ollama/models/`
+
+📂 中文说明：
+
+下载 Ollama 主程序后，请使用命令 `ollama run 模型名`（如 `ollama run llama3`）下载模型。  
+模型通常保存在用户主目录的 `.ollama/models` 中，下载完成后请将模型复制到项目内的 `src/ollama/models/` 文件夹中。
+
+- 🔗 [模型命令参考：ollama run llama3](https://ollama.com/library)
 
 ---
 
@@ -76,8 +96,11 @@ src/
 
 ## 📷 Screenshots
 
-> *(Insert pet screenshots and animations here)*  
-> 示例：宠物吃香蕉 / 拖动挣扎 / 聊天窗口 / 待办窗口 等
+### 🐒 Gorilla on Desktop
+
+> Here's what your desktop looks like with the pet running:
+
+![gorilla-desktop](./screenshots/adver.png)
 
 ---
 

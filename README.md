@@ -94,13 +94,10 @@ src/
 
 ---
 
-## 📷 Screenshots
-
 ### 🐒 Gorilla on Desktop
 
-> Here's what your desktop looks like with the pet running:
-
-![gorilla-desktop](./screenshots/adver.png)
+> Interactive with your desk pet!
+![gorilla-desktop](./screenshots/struggle.gif)
 
 ---
 

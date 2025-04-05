@@ -196,11 +196,11 @@ ipcMain.on("open-chat", () => {
 });
 
 ipcMain.on("open-food", () => {
-    createChildWindow("food", "features/food/food.html", 300, 400, 200, 0);
+    createChildWindow("food", "features/food/food.html", 180, 180, 170, 50);
 });
 
 ipcMain.on("open-note",()=>{
-    createChildWindow("note","features/note/note.html",400,500,200,0);
+    createChildWindow("note","features/note/note.html",400,500,230,0);
 })
 
 // 获取所有任务
@@ -239,17 +239,28 @@ ipcMain.on("feed-pet", (event, energy, foodType) => {
     mainwindow.webContents.send("update-energy", energy, foodType); // ✨ 一起发给前端
   });
   
-function updateChildWindowsPosition() {
+  function updateChildWindowsPosition() {
     if (!mainwindow) return;
 
     const mainBounds = mainwindow.getBounds();
 
     for (const key in childWindows) {
         if (childWindows[key] && !childWindows[key].isDestroyed()) {
-            let offsetX = childWindowOffsets[key]?.xOffset ?? 200;  // 默认 X 偏移量
-            let offsetY = childWindowOffsets[key]?.yOffset ?? 0;    // 默认 Y 偏移量
+            let offsetX = 200, offsetY = 0;
 
-            // 防止窗口跑出屏幕外
+            if (key === 'todo') {
+                offsetX = 160;
+            } else if (key === 'note') {
+                offsetX = 230;
+            } else if (key === "food"){
+              offsetY = 50;
+              offsetX = 170;
+            } 
+            else if (childWindowOffsets[key]) {
+                offsetX = childWindowOffsets[key].xOffset ?? 200;
+                offsetY = childWindowOffsets[key].yOffset ?? 0;
+            }
+
             const newX = Math.max(0, mainBounds.x + offsetX);
             const newY = Math.max(0, mainBounds.y + offsetY);
 
@@ -262,6 +273,7 @@ function updateChildWindowsPosition() {
         }
     }
 }
+
 
 ipcMain.handle("loadNote", () => {
     if (fs.existsSync(notePath)) {

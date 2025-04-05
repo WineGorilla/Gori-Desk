@@ -91,13 +91,14 @@
 }
 
 /* 小圆点样式 */
-.functions div {
+.functions img {
     width: 30px;
     height: 30px;
-    background-color: grey;
     border-radius: 50%;
     cursor: pointer;
     -webkit-app-region: no-drag;
+    transform: scale(1);
+    transition: all 0.25s ease;
 }
 
 .pet-energy-container {
@@ -139,6 +140,33 @@
 
 
 
+.functions img:nth-child(1) {
+  transform: rotate(-60deg) translate(15px) rotate(60deg);
+}
+.functions img:nth-child(2) {
+  transform: rotate(-20deg) translate(15px) rotate(20deg);
+}
+.functions img:nth-child(3) {
+  transform: rotate(20deg) translate(15px) rotate(-20deg);
+}
+.functions img:nth-child(4) {
+  transform: rotate(60deg) translate(15px) rotate(-60deg);
+}
+
+.functions img:nth-child(1):hover {
+  transform: rotate(-60deg) translate(15px) rotate(60deg) scale(1.15);
+}
+.functions img:nth-child(2):hover {
+  transform: rotate(-20deg) translate(15px) rotate(20deg) scale(1.15);
+}
+.functions img:nth-child(3):hover {
+  transform: rotate(20deg) translate(15px) rotate(-20deg) scale(1.15);
+}
+.functions img:nth-child(4):hover {
+  transform: rotate(60deg) translate(15px) rotate(-60deg) scale(1.15);
+}
+
+
 </style>
 </head>
 <body>
@@ -155,10 +183,10 @@
             </div>
         </div>
         <div class="functions">
-            <div class="chat"></div>
-            <div class="record"></div>
-            <div class="eat"></div>
-            <div class="note"></div>
+            <img class="chat" src="../assets/icon/ai.svg" title="AI">
+            <img class="record" src="../assets/icon/todo.svg" title="todo" />
+            <img class="eat" src="../assets/icon/eat.svg" title="eat" />
+            <img class="note" src="../assets/icon/note.svg" title="note" />
         </div>
         <ul id="custom-menu" class="context-menu">
             <li id="menu-info">👤个人信息</li>

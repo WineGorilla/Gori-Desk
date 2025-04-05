@@ -1,0 +1,14 @@
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M19.5 10C19.5 15.2467 15.2467 19.5 10 19.5C4.75329 19.5 0.5 15.2467 0.5 10C0.5 4.75329 4.75329 0.5 10 0.5C15.2467 0.5 19.5 4.75329 19.5 10Z" fill="#FFD290" stroke="black"/>
+<rect x="5" y="4" width="10" height="12" rx="2" fill="white"/>
+<circle cx="6.5" cy="6.5" r="0.55" fill="#F83D3D"/>
+<circle cx="6.5" cy="6.5" r="0.55" fill="#CDCDCD"/>
+<circle cx="6.5" cy="6.5" r="0.55" stroke="black" stroke-width="0.1"/>
+<circle cx="6.5" cy="12.5" r="0.45" fill="#CDCDCD" stroke="black" stroke-width="0.1"/>
+<line x1="8" y1="6.95" x2="14" y2="6.95" stroke="#B2B2B2" stroke-width="0.1"/>
+<line x1="8" y1="10.95" x2="14" y2="10.95" stroke="#B2B2B2" stroke-width="0.1"/>
+<line x1="8" y1="12.95" x2="14" y2="12.95" stroke="#B2B2B2" stroke-width="0.1"/>
+<line x1="8" y1="8.95" x2="14" y2="8.95" stroke="#B2B2B2" stroke-width="0.1"/>
+<circle cx="6.5" cy="8.5" r="0.45" fill="#CDCDCD" stroke="black" stroke-width="0.1"/>
+<circle cx="6.5" cy="10.5" r="0.45" fill="#CDCDCD" stroke="black" stroke-width="0.1"/>
+</svg>

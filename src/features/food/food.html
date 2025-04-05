@@ -6,36 +6,39 @@
   <title>选择食物</title>
   <style>
     body {
-      text-align: center;
       font-family: 'Segoe UI', Arial, sans-serif;
       margin: 0;
-      padding: 40px 0;
-    }
-
-    h2 {
-      font-size: 24px;
-      color: #333;
     }
 
     .food-list {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 16px;
-      margin-top: 30px;
+      gap: 8px;
+      margin-top: 20px;
     }
 
     .food-item {
-      width: 240px;
-      padding: 14px 20px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      font-size: 18px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border: 2px solid transparent;
-    }
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  line-height: 1.2;
+  padding: 10px;
+  text-align: center;
+}
+
 
     .food-item:hover {
       transform: scale(1.05);
@@ -51,11 +54,10 @@
   </style>
 </head>
 <body>
-  <h2>请选择宠物食物</h2>
   <div class="food-list">
-    <div class="food-item" data-energy="10" data-food="banana">🍌 香蕉 (+10)</div>
-    <div class="food-item" data-energy="20" data-food="cola">🥤 可乐 (+20)</div>
-    <div class="food-item" data-energy="30" data-food="yogurt">🥛 酸奶 (+30)</div>    
+    <div class="food-item" data-energy="10" data-food="banana">🍌 香蕉</div>
+    <div class="food-item" data-energy="20" data-food="cola">🥤 可乐</div>
+    <div class="food-item" data-energy="30" data-food="yogurt">🥛 酸奶</div>    
   </div>
 
   <script>

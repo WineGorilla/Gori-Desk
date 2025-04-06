@@ -32,7 +32,10 @@ document.addEventListener("DOMContentLoaded", () => {
     })
 
     document.getElementById("menu-info").addEventListener("click",()=>{
-        window.menuAPI.openSetting();
+        window.menuAPI.openInfo();
+    })
+    document.getElementById("menu-setting").addEventListener("click",()=>{
+        window.settingAPI.openSetting();
     })
 });
 

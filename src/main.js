@@ -3,21 +3,24 @@ const path = require("path");
 const sqlite3 = require("sqlite3").verbose();
 const fs = require("fs");
 const RWKV = require("rwkv-cpp-node");
-const {spawn} = require("child_process")
+const {spawn} = require("child_process");
+const { languages } = require("prismjs");
 
 let flaskProcess = null;
 let mainwindow;
 let todoWindow;
 let chatWindow;
 let foodWindow;
+let infoWindow;
 let settingWindow;
 let childWindows = {};
 let childWindowOffsets = {}; //存储子窗口的自定义偏移量
 let isDragging = false;
 let dragTimeout;
-const rwkvModelPath = path.join("C:", "Users", "Ricar", "NYU", "q8_0-RWKV-4-Raven-7B-v12-Eng49%25-Chn49%25-Jpn1%25-Other1%25-20230530-ctx8192.bin");
 let rwkvInstance = null;
 const notePath = path.join(__dirname,"note.txt");
+const configDir = path.join(__dirname, "..",'config');
+const settingsPath = path.join(configDir, 'settings.json');
 
 const db = new sqlite3.Database(path.join(__dirname,"todo.db"),(err)=>{
     if (err) console.error("Connect error")
@@ -338,11 +341,11 @@ ipcMain.on("exit-app",()=>{
     app.quit();
 })
 
-ipcMain.on("open-setting", () => {
-    settingWindow = new BrowserWindow({
+ipcMain.on("open-info", () => {
+    infoWindow = new BrowserWindow({
         width: 600,
         height: 600,
-        title: "setting",
+        title: "Info",
         alwaysOnTop: true,
         transparent: true, // 透明背景
         parent: mainwindow,
@@ -355,11 +358,11 @@ ipcMain.on("open-setting", () => {
         }
     });
 
-    settingWindow.loadFile(path.join(__dirname, "features/setting/info.html"));
+    infoWindow.loadFile(path.join(__dirname, "features/info/info.html"));
 
     // 可选：关闭时清除引用
-    settingWindow.on("closed", () => {
-        settingWindow = null;
+    infoWindow.on("closed", () => {
+        infoWindow = null;
     });
 });
 
@@ -497,6 +500,78 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
   
     console.log("🚀 Flask backend started...");
   }
+
+
+
+  ipcMain.handle('get-settings', async () => {
+    try {
+      if (!fs.existsSync(settingsPath)) {
+        // 默认设置
+        const defaultSettings = {
+          language: 'zh',
+          model: 'phi',
+          transparency: 100,
+          autoLaunch: false,
+          enableChat: true
+        };
+        fs.writeFileSync(settingsPath, JSON.stringify(defaultSettings, null, 2));
+        return defaultSettings;
+      }
+      const data = fs.readFileSync(settingsPath);
+      return JSON.parse(data);
+    } catch (err) {
+      console.error('读取设置失败:', err);
+      return null;
+    }
+  });
+  
+  // 保存设置
+  ipcMain.on('save-settings', (event, settings) => {
+    try {
+      fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2));
+      console.log('设置已保存:', settings);
+    } catch (err) {
+      console.error('保存设置失败:', err);
+    }
+  });
+
+  ipcMain.on("open-setting", () => {
+    if (settingWindow) {
+      settingWindow.focus();
+      return;
+    }
+  
+    settingWindow = new BrowserWindow({
+      width: 600,
+      height: 600,
+      title: "Settings",
+      alwaysOnTop: true,
+      transparent: true,
+      parent: mainwindow,
+      backgroundColor: "#00000000",
+      resizable: true,
+      minimizable: false,
+      webPreferences: {
+        preload: path.join(__dirname, "../preload.js"),
+        contextIsolation: true
+      }
+    });
+  
+    settingWindow.loadFile(path.join(__dirname, "features/setting/setting.html"));
+  
+    settingWindow.on("closed", () => {
+      settingWindow = null;
+    });
+  });
+
+  ipcMain.on('update-transparency', (event, value) => {
+    if (mainwindow && mainwindow.webContents) {
+      mainwindow.webContents.send('update-transparency', value); // 发给 index.html
+    }
+  });
+  
+  
+
   
 
 

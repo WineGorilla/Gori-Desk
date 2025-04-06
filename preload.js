@@ -36,7 +36,7 @@ contextBridge.exposeInMainWorld("noteAPI", {
 
 contextBridge.exposeInMainWorld("menuAPI", {
     exitApp: () => ipcRenderer.send("exit-app"),
-    openSetting:()=>ipcRenderer.send("open-setting")
+    openInfo:()=>ipcRenderer.send("open-info")
 });
 
 contextBridge.exposeInMainWorld("talkAPI", {
@@ -54,6 +54,16 @@ contextBridge.exposeInMainWorld("talkAPI", {
       const result = await ipcRenderer.invoke("send-message-to-ai", message);
       return result;
     }
+  });
+
+  contextBridge.exposeInMainWorld('settingAPI', {
+    getSettings: () => ipcRenderer.invoke('get-settings'),
+    saveSettings: (settings) => ipcRenderer.send('save-settings', settings),
+    openSetting: () => ipcRenderer.send('open-setting'),
+    sendTransparencyToMain: (value) => ipcRenderer.send('update-transparency', value),
+    onTransparencyChange: (callback) => ipcRenderer.on('update-transparency', (event, value) => {
+      callback(value);
+    })
   });
   
 

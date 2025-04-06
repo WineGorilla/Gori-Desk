@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>设置</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      padding: 20px;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+
+    h2 {
+      margin-top: 30px;
+      color: #444;
+    }
+
+    .setting-group {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    select, input[type="range"] {
+      width: 100%;
+      padding: 5px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .switch {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    .switch input {
+      width: auto;
+    }
+
+    #saveBtn {
+      width: 100%;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    #saveBtn:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+    <!-- 加一个加载提示 -->
+    <div id="loading" style="text-align:center; margin-top: 100px;">正在加载设置中...</div>
+  
+    <!-- 主内容区域：初始隐藏，加载完后显示 -->
+    <div id="mainUI" style="display: none;">
+  
+      <h1 id="titleText">设置 Settings</h1>
+  
+      <div class="setting-group">
+        <h2 id="langTitle">🌐 语言 Language</h2>
+        <label for="languageSelect" id="langLabel">选择语言 / Select Language:</label>
+        <select id="languageSelect">
+          <option value="zh">中文</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+  
+      <div class="setting-group">
+        <h2 id="modelTitle">🤖 模型选择 AI Model</h2>
+        <label for="modelSelect" id="modelLabel">选择大语言模型:</label>
+        <select id="modelSelect">
+          <option value="phi">RWKV</option>
+          <option value="ollama">Ollama</option>
+        </select>
+      </div>
+  
+      <div class="setting-group">
+        <h2 id="transTitle">🌫️ 桌宠透明度 Transparency</h2>
+        <label for="transparencyRange" id="transLabel">透明度 (0% ~ 100%):</label>
+        <input type="range" id="transparencyRange" min="20" max="100" step="1">
+      </div>
+  
+      <div class="setting-group">
+        <h2 id="startupTitle">⚙️ 启动项 Startup</h2>
+        <div class="switch">
+          <label for="autoLaunch" id="autoLaunchLabel">开机自启:</label>
+          <input type="checkbox" id="autoLaunch">
+        </div>
+      </div>
+  
+      <div class="setting-group">
+        <h2 id="chatTitle">💬 对话功能 Chat</h2>
+        <div class="switch">
+          <label for="enableChat" id="chatLabel">启用对话:</label>
+          <input type="checkbox" id="enableChat">
+        </div>
+      </div>
+  
+      <button id="saveBtn">保存设置 / Save Settings</button>
+    </div>
+
+<script>
+  // 多语言配置 + 界面文本切换函数
+  function updateLanguage(lang) {
+    const i18n = {
+      zh: {
+        title: "设置",
+        language: "🌐 语言 Language",
+        selectLanguage: "选择语言 / Select Language:",
+        modelTitle: "🤖 模型选择 AI Model",
+        selectModel: "选择大语言模型:",
+        transparencyTitle: "🌫️ 桌宠透明度 Transparency",
+        transparencyLabel: "透明度 (0% ~ 100%):",
+        startupTitle: "⚙️ 启动项 Startup",
+        autoLaunch: "开机自启:",
+        chatTitle: "💬 对话功能 Chat",
+        enableChat: "启用对话:",
+        save: "保存设置"
+      },
+      en: {
+        title: "Settings",
+        language: "🌐 Language",
+        selectLanguage: "Choose Language:",
+        modelTitle: "🤖 AI Model Selection",
+        selectModel: "Choose AI Model:",
+        transparencyTitle: "🌫️ Pet Transparency",
+        transparencyLabel: "Transparency (0% ~ 100%):",
+        startupTitle: "⚙️ Startup",
+        autoLaunch: "Auto Launch:",
+        chatTitle: "💬 Chat Feature",
+        enableChat: "Enable Chat:",
+        save: "Save Settings"
+      }
+    };
+
+    const t = i18n[lang] || i18n.zh;
+
+    document.title = t.title;
+    document.getElementById('titleText').textContent = t.title;
+    document.getElementById('langTitle').textContent = t.language;
+    document.getElementById('langLabel').textContent = t.selectLanguage;
+    document.getElementById('modelTitle').textContent = t.modelTitle;
+    document.getElementById('modelLabel').textContent = t.selectModel;
+    document.getElementById('transTitle').textContent = t.transparencyTitle;
+    document.getElementById('transLabel').textContent = t.transparencyLabel;
+    document.getElementById('startupTitle').textContent = t.startupTitle;
+    document.getElementById('autoLaunchLabel').textContent = t.autoLaunch;
+    document.getElementById('chatTitle').textContent = t.chatTitle;
+    document.getElementById('chatLabel').textContent = t.enableChat;
+    document.getElementById('saveBtn').textContent = t.save;
+  }
+
+  // 初始化设置（读取本地 JSON）
+  async function initSettings() {
+    try {
+      console.log("🛠️ 正在尝试读取设置...");
+      if (!window.settingAPI) throw new Error("❌ settingAPI 不存在");
+
+      const settings = await window.settingAPI.getSettings();
+      console.log("✅ 设置读取成功:", settings);
+
+      if (!settings || typeof settings !== "object") throw new Error("❌ 设置返回无效");
+
+      // 初始化控件值
+      document.getElementById('languageSelect').value = settings.language;
+      document.getElementById('modelSelect').value = settings.model;
+      document.getElementById('transparencyRange').value = settings.transparency;
+      document.getElementById('autoLaunch').checked = settings.autoLaunch;
+      document.getElementById('enableChat').checked = settings.enableChat;
+
+      // 多语言文本切换
+      updateLanguage(settings.language);
+
+      // 显示主UI
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('mainUI').style.display = 'block';
+    } catch (err) {
+      console.error("❌ 设置加载失败:", err);
+      document.getElementById('loading').innerHTML =
+        '<span style="color:#e74c3c;font-size:20px">❌ 设置加载失败，请重启应用</span>';
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', initSettings);
+
+  // 保存按钮逻辑
+  document.getElementById('saveBtn').addEventListener('click', () => {
+    const settings = {
+      language: document.getElementById('languageSelect').value,
+      model: document.getElementById('modelSelect').value,
+      transparency: parseInt(document.getElementById('transparencyRange').value),
+      autoLaunch: document.getElementById('autoLaunch').checked,
+      enableChat: document.getElementById('enableChat').checked
+    };
+
+    // 保存设置
+    window.settingAPI.saveSettings(settings);
+
+    // 语言立即切换
+    updateLanguage(settings.language);
+
+    // 提示成功
+    alert(settings.language === 'zh' ? '设置已保存！' : 'Settings saved!');
+  });
+
+  document.getElementById('transparencyRange').addEventListener('input', (e) => {
+  const value = parseInt(e.target.value);
+  window.settingAPI.sendTransparencyToMain(value); // 向主进程发送
+});
+
+
+</script>
+
+
+</body>
+</html>
+

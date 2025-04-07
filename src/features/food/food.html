@@ -55,22 +55,48 @@
 </head>
 <body>
   <div class="food-list">
-    <div class="food-item" data-energy="10" data-food="banana">🍌 香蕉</div>
-    <div class="food-item" data-energy="20" data-food="cola">🥤 可乐</div>
-    <div class="food-item" data-energy="30" data-food="yogurt">🥛 酸奶</div>    
+    <div class="food-item" id="food-banana" data-energy="10" data-food="banana">🍌 Banana</div>
+    <div class="food-item" id="food-cola" data-energy="20" data-food="cola">🥤 Cola</div>
+    <div class="food-item" id="food-yogurt" data-energy="30" data-food="yogurt">🥛 Yogurt</div>    
   </div>
 
   <script>
-document.querySelectorAll(".food-item").forEach(item => {
-  item.addEventListener("click", () => {
-    const energy = parseInt(item.getAttribute("data-energy"), 10);
-    const food = item.getAttribute("data-food"); // 🍌 获取食物类型
-    window.eatAPI.feedPet(energy, food); // ✨ 一起发送
-    setTimeout(() => window.close(), 200);
-  });
-});
+    const i18n = {
+      zh: {
+        banana: "🍌 香蕉",
+        cola: "🥤 可乐",
+        yogurt: "🥛 酸奶"
+      },
+      en: {
+        banana: "🍌 Banana",
+        cola: "🥤 Cola",
+        yogurt: "🥛 Yogurt"
+      }
+    };
 
+    async function updateLanguageUI() {
+      const settings = await window.settingAPI.getSettings();
+      const lang = settings.language || "zh";
+      const t = i18n[lang];
+
+      document.getElementById("food-banana").textContent = t.banana;
+      document.getElementById("food-cola").textContent = t.cola;
+      document.getElementById("food-yogurt").textContent = t.yogurt;
+    }
+
+    updateLanguageUI(); // 初始化语言
+
+    // 添加点击事件
+    document.querySelectorAll(".food-item").forEach(item => {
+      item.addEventListener("click", () => {
+        const energy = parseInt(item.getAttribute("data-energy"), 10);
+        const food = item.getAttribute("data-food");
+        window.eatAPI.feedPet(energy, food);
+        setTimeout(() => window.close(), 200);
+      });
+    });
   </script>
 </body>
+
 </html>
 

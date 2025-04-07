@@ -50,20 +50,29 @@ contextBridge.exposeInMainWorld("talkAPI", {
   });
 
   contextBridge.exposeInMainWorld("chatAI", {
-    sendMessage: async (message) => {
-      const result = await ipcRenderer.invoke("send-message-to-ai", message);
-      return result;
-    }
+    sendMessage: (message) => ipcRenderer.invoke("send-message-to-ai", message),
+    notifyClose: () => ipcRenderer.send("chat-window-close")
   });
+  
 
   contextBridge.exposeInMainWorld('settingAPI', {
     getSettings: () => ipcRenderer.invoke('get-settings'),
     saveSettings: (settings) => ipcRenderer.send('save-settings', settings),
     openSetting: () => ipcRenderer.send('open-setting'),
+  
     sendTransparencyToMain: (value) => ipcRenderer.send('update-transparency', value),
     onTransparencyChange: (callback) => ipcRenderer.on('update-transparency', (event, value) => {
       callback(value);
-    })
+    }),
+  
+    onLanguageChange: (callback) => {
+      ipcRenderer.on('change-language', (event, lang) => {
+        callback(lang);
+      });
+    },
+  
+    changeLanguage: (lang) => ipcRenderer.send('change-language', lang)
   });
+  
   
 

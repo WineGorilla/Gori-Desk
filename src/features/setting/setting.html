@@ -118,114 +118,140 @@
     </div>
 
 <script>
-  // 多语言配置 + 界面文本切换函数
-  function updateLanguage(lang) {
-    const i18n = {
-      zh: {
-        title: "设置",
-        language: "🌐 语言 Language",
-        selectLanguage: "选择语言 / Select Language:",
-        modelTitle: "🤖 模型选择 AI Model",
-        selectModel: "选择大语言模型:",
-        transparencyTitle: "🌫️ 桌宠透明度 Transparency",
-        transparencyLabel: "透明度 (0% ~ 100%):",
-        startupTitle: "⚙️ 启动项 Startup",
-        autoLaunch: "开机自启:",
-        chatTitle: "💬 对话功能 Chat",
-        enableChat: "启用对话:",
-        save: "保存设置"
-      },
-      en: {
-        title: "Settings",
-        language: "🌐 Language",
-        selectLanguage: "Choose Language:",
-        modelTitle: "🤖 AI Model Selection",
-        selectModel: "Choose AI Model:",
-        transparencyTitle: "🌫️ Pet Transparency",
-        transparencyLabel: "Transparency (0% ~ 100%):",
-        startupTitle: "⚙️ Startup",
-        autoLaunch: "Auto Launch:",
-        chatTitle: "💬 Chat Feature",
-        enableChat: "Enable Chat:",
-        save: "Save Settings"
-      }
-    };
+// setting.js
 
-    const t = i18n[lang] || i18n.zh;
-
-    document.title = t.title;
-    document.getElementById('titleText').textContent = t.title;
-    document.getElementById('langTitle').textContent = t.language;
-    document.getElementById('langLabel').textContent = t.selectLanguage;
-    document.getElementById('modelTitle').textContent = t.modelTitle;
-    document.getElementById('modelLabel').textContent = t.selectModel;
-    document.getElementById('transTitle').textContent = t.transparencyTitle;
-    document.getElementById('transLabel').textContent = t.transparencyLabel;
-    document.getElementById('startupTitle').textContent = t.startupTitle;
-    document.getElementById('autoLaunchLabel').textContent = t.autoLaunch;
-    document.getElementById('chatTitle').textContent = t.chatTitle;
-    document.getElementById('chatLabel').textContent = t.enableChat;
-    document.getElementById('saveBtn').textContent = t.save;
+// 🌐 多语言字典配置
+const i18n = {
+  zh: {
+    title: "设置",
+    language: "🌐 语言 Language",
+    selectLanguage: "选择语言 / Select Language:",
+    modelTitle: "🤖 模型选择 AI Model",
+    selectModel: "选择大语言模型:",
+    transparencyTitle: "🌫️ 桌宠透明度 Transparency",
+    transparencyLabel: "透明度 (0% ~ 100%):",
+    startupTitle: "⚙️ 启动项 Startup",
+    autoLaunch: "开机自启:",
+    chatTitle: "💬 对话功能 Chat",
+    enableChat: "启用对话:",
+    save: "保存设置"
+  },
+  en: {
+    title: "Settings",
+    language: "🌐 Language",
+    selectLanguage: "Choose Language:",
+    modelTitle: "🤖 AI Model Selection",
+    selectModel: "Choose AI Model:",
+    transparencyTitle: "🌫️ Pet Transparency",
+    transparencyLabel: "Transparency (0% ~ 100%):",
+    startupTitle: "⚙️ Startup",
+    autoLaunch: "Auto Launch:",
+    chatTitle: "💬 Chat Feature",
+    enableChat: "Enable Chat:",
+    save: "Save Settings"
   }
+};
 
-  // 初始化设置（读取本地 JSON）
-  async function initSettings() {
-    try {
-      console.log("🛠️ 正在尝试读取设置...");
-      if (!window.settingAPI) throw new Error("❌ settingAPI 不存在");
+// 🔄 应用界面语言
+function updateLanguage(lang) {
+  const t = i18n[lang] || i18n.zh;
 
-      const settings = await window.settingAPI.getSettings();
-      console.log("✅ 设置读取成功:", settings);
+  document.title = t.title;
+  document.getElementById("titleText").textContent = t.title;
+  document.getElementById("langTitle").textContent = t.language;
+  document.getElementById("langLabel").textContent = t.selectLanguage;
+  document.getElementById("modelTitle").textContent = t.modelTitle;
+  document.getElementById("modelLabel").textContent = t.selectModel;
+  document.getElementById("transTitle").textContent = t.transparencyTitle;
+  document.getElementById("transLabel").textContent = t.transparencyLabel;
+  document.getElementById("startupTitle").textContent = t.startupTitle;
+  document.getElementById("autoLaunchLabel").textContent = t.autoLaunch;
+  document.getElementById("chatTitle").textContent = t.chatTitle;
+  document.getElementById("chatLabel").textContent = t.enableChat;
+  document.getElementById("saveBtn").textContent = t.save;
+}
 
-      if (!settings || typeof settings !== "object") throw new Error("❌ 设置返回无效");
+// 📦 初始化设置
+async function initSettings() {
+  try {
+    console.log("🛠️ 正在尝试读取设置...");
+    if (!window.settingAPI) throw new Error("❌ settingAPI 不存在");
 
-      // 初始化控件值
-      document.getElementById('languageSelect').value = settings.language;
-      document.getElementById('modelSelect').value = settings.model;
-      document.getElementById('transparencyRange').value = settings.transparency;
-      document.getElementById('autoLaunch').checked = settings.autoLaunch;
-      document.getElementById('enableChat').checked = settings.enableChat;
+    const settings = await window.settingAPI.getSettings();
+    console.log("✅ 设置读取成功:", settings);
 
-      // 多语言文本切换
-      updateLanguage(settings.language);
+    if (!settings || typeof settings !== "object") throw new Error("❌ 设置返回无效");
 
-      // 显示主UI
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('mainUI').style.display = 'block';
-    } catch (err) {
-      console.error("❌ 设置加载失败:", err);
-      document.getElementById('loading').innerHTML =
-        '<span style="color:#e74c3c;font-size:20px">❌ 设置加载失败，请重启应用</span>';
-    }
-  }
+    // 初始化表单控件
+    document.getElementById("languageSelect").value = settings.language;
+    document.getElementById("modelSelect").value = settings.model;
+    document.getElementById("transparencyRange").value = settings.transparency;
+    document.getElementById("autoLaunch").checked = settings.autoLaunch;
+    document.getElementById("enableChat").checked = settings.enableChat;
 
-  window.addEventListener('DOMContentLoaded', initSettings);
-
-  // 保存按钮逻辑
-  document.getElementById('saveBtn').addEventListener('click', () => {
-    const settings = {
-      language: document.getElementById('languageSelect').value,
-      model: document.getElementById('modelSelect').value,
-      transparency: parseInt(document.getElementById('transparencyRange').value),
-      autoLaunch: document.getElementById('autoLaunch').checked,
-      enableChat: document.getElementById('enableChat').checked
-    };
-
-    // 保存设置
-    window.settingAPI.saveSettings(settings);
-
-    // 语言立即切换
+    // 应用语言
     updateLanguage(settings.language);
 
-    // 提示成功
-    alert(settings.language === 'zh' ? '设置已保存！' : 'Settings saved!');
+    // 显示主UI
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("mainUI").style.display = "block";
+  } catch (err) {
+    console.error("❌ 设置加载失败:", err);
+    document.getElementById("loading").innerHTML =
+      '<span style="color:#e74c3c;font-size:20px">❌ 设置加载失败，请重启应用</span>';
+  }
+}
+
+// 💾 保存设置
+function bindSaveButton() {
+  document.getElementById("saveBtn").addEventListener("click", () => {
+    const settings = {
+      language: document.getElementById("languageSelect").value,
+      model: document.getElementById("modelSelect").value,
+      transparency: parseInt(document.getElementById("transparencyRange").value),
+      autoLaunch: document.getElementById("autoLaunch").checked,
+      enableChat: document.getElementById("enableChat").checked
+    };
+
+    window.settingAPI.saveSettings(settings);
+    updateLanguage(settings.language);
+
+    alert(settings.language === "zh" ? "设置已保存！" : "Settings saved!");
   });
+}
 
-  document.getElementById('transparencyRange').addEventListener('input', (e) => {
-  const value = parseInt(e.target.value);
-  window.settingAPI.sendTransparencyToMain(value); // 向主进程发送
+// 🌐 语言切换同步主窗口
+function bindLanguageChange() {
+  document.getElementById("languageSelect").addEventListener("change", () => {
+    const lang = document.getElementById("languageSelect").value;
+    updateLanguage(lang);
+    window.settingAPI.changeLanguage(lang);
+
+    // 自动保存语言字段
+    window.settingAPI.getSettings().then((settings) => {
+      settings.language = lang;
+      window.settingAPI.saveSettings(settings);
+    });
+
+    console.log("[设置页] 切换语言并同步:", lang);
+  });
+}
+
+// 🌫️ 实时透明度调整
+function bindTransparencyChange() {
+  document.getElementById("transparencyRange").addEventListener("input", (e) => {
+    const value = parseInt(e.target.value);
+    window.settingAPI.sendTransparencyToMain(value);
+  });
+}
+
+// 🚀 页面加载后初始化
+window.addEventListener("DOMContentLoaded", () => {
+  initSettings();
+  bindSaveButton();
+  bindLanguageChange();
+  bindTransparencyChange();
 });
-
 
 </script>
 

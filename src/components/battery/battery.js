@@ -114,7 +114,7 @@ window.eatAPI?.onEnergyUpdate((energy, foodType) => {
 
 
 // ----------------- 定时能量消耗 ------------------
-setInterval(decreaseEnergy, 1000); // 建议调回更合理的时间（如 10 秒减 10）
+setInterval(decreaseEnergy, 10000); // 建议调回更合理的时间（如 10 秒减 10）
 
 
 

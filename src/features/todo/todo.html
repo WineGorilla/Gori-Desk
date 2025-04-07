@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>待办事项</title>
+    <title>TODO List</title>
     <style>
         * {
           box-sizing: border-box;
@@ -82,7 +82,7 @@
           margin-top: 12px;
         }
     
-        .header {
+        #header {
           font-size: 20px;
           font-weight: bold;
           color: orange;
@@ -163,11 +163,29 @@
             <li><span class="circle"></span> 认真学习</li>
         </ul>
         <div class="footer">
-            <div class="header">清单</div>
+            <div id="header">List</div>
             <div class="add" onclick="addTask()">+</div>
         </div>
     </div>
-<script src="todo.js">
+<script src="todo.js"></script>
+<script>
+  const i18n = {
+    zh:{
+      header:"事项"
+    },
+    en:{
+      header:"List"
+    }
+  }
+
+  async function updateLanguageUI() {
+    const settings = await window.settingAPI.getSettings();
+    const lang = settings.language || "zh";
+    const t = i18n[lang];
+
+    document.getElementById("header").textContent = t.header;
+  }
+  updateLanguageUI();
 </script>
 </body>
 </html>

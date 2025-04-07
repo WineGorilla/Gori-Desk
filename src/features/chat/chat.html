@@ -121,15 +121,26 @@
         box-shadow: 0 0 0 2px rgba(9,105,218,0.2);
     }
 
+    .close-btn {
+  float: right;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 18px;
+}
+.close-btn:hover {
+  color: red;
+}
+
   </style>
 </head>
 <body>
   <div class="container">
     <h4>💬GoriDesk</h4>
+    <div class="close-btn" onclick="closeChat()" title="关闭">x</div>
     <hr>
     <div id="chat-box"></div>
     <div class="input-row">
-      <textarea id="message" placeholder="输入消息..." rows="2"></textarea>
+      <textarea id="message" placeholder="..." rows="2"></textarea>
       <div class="functionBox">
         <button>图片</button>
         <button onclick="sendMessage()">发送</button>
@@ -158,6 +169,10 @@ async function sendMessage() {
     aiMsg.textContent = aiReply;
     chatBox.appendChild(aiMsg);
     chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function closeChat() {
+  window.chatAPI.notifyClose(); // 让主进程做所有事
 }
 
   </script>

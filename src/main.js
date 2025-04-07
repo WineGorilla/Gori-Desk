@@ -488,20 +488,55 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
     }
   });
   
+  
   function startFlask() {
-    if (flaskProcess) return; // 避免重复启动
+    if (flaskProcess) return;
   
     flaskProcess = spawn("python", ["backend/app.py"], {
       cwd: __dirname,
-      shell: true,
-      detached: true,
-      stdio: "ignore"
+      detached: process.platform !== "win32", // 🟢 仅非 Windows 启用 detached
+      stdio: "ignore",
+      windowsHide: true
     });
   
-    console.log("🚀 Flask backend started...");
+    if (process.platform !== "win32") {
+      flaskProcess.unref();
+    }
+  
+    console.log("🚀 Flask started with PID:", flaskProcess.pid);
   }
-
-
+  
+  // 停止 Flask
+  function stopFlask() {
+    if (flaskProcess && flaskProcess.pid) {
+      try {
+        if (process.platform === "win32") {
+          // Windows 上直接 kill pid
+          spawn("taskkill", ["/PID", flaskProcess.pid, "/T", "/F"]);
+        } else {
+          // macOS / Linux 上 kill 整个进程组
+          process.kill(-flaskProcess.pid);
+        }
+  
+        console.log("🛑 Flask backend stopped.");
+      } catch (err) {
+        console.error("❌ 无法终止 Flask:", err);
+      }
+      flaskProcess = null;
+    }
+  }
+  
+  // ⬅️ 监听关闭指令（来自渲染进程）
+  ipcMain.on("chat-window-close", () => {
+    stopFlask(); // 停止 Flask
+  
+    if (chatWindow && !chatWindow.isDestroyed()) {
+      chatWindow.close(); // 主进程关闭窗口
+      chatWindow = null;
+    }
+  });
+  
+  
 
   ipcMain.handle('get-settings', async () => {
     try {
@@ -566,9 +601,16 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
 
   ipcMain.on('update-transparency', (event, value) => {
     if (mainwindow && mainwindow.webContents) {
-      mainwindow.webContents.send('update-transparency', value); // 发给 index.html
+      mainwindow.webContents.send('update-transparency', value);
     }
   });
+  
+  ipcMain.on('change-language', (event, lang) => {
+    if (mainwindow && mainwindow.webContents) {
+      mainwindow.webContents.send('change-language', lang);
+    }
+  });
+  
   
   
 

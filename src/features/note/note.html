@@ -145,25 +145,53 @@
 <body>
     <!-- 顶部工具栏 -->
     <div class="toolbar">
-<!-- 子窗口HTML顶部 -->
-        <div class="window-header">
-            <span>📝 我的笔记</span>
-            <button class="close-btn">❌</button>
+      <!-- 子窗口HTML顶部 -->
+      <div class="window-header">
+        <span id="header">📝 My Note</span>
+        <button class="close-btn">❌</button>
+      </div>
+      <div class="export-container">
+        <button id="export-btn" class="export-btn">📂 Import ▼</button>
+        <div class="dropdown">
+          <button id="exportTxt">📄 TXT</button>
+          <button id="exportMd">📄 MD</button>
         </div>
-        <div class="export-container">
-            <button class="export-btn">📂 导出 ▼</button>
-            <div class="dropdown">
-                <button id="exportTxt">📄 导出 TXT</button>
-                <button id="exportMd">📄 导出 MD</button>
-            </div>
-        </div>
+      </div>
     </div>
-
+  
     <!-- 笔记区域 -->
     <div class="note-container">
-        <textarea id="note-area" placeholder="写点什么吧..."></textarea>
+      <textarea id="note-area" placeholder="写点什么吧..."></textarea>
     </div>
+  
     <script src="note.js"></script>
-</body>
+    <script>
+      const i18n = {
+        zh: {
+          header: "📝 笔记",
+          export: "📂 导出 ▼",
+          placeholder: "写点什么吧..."
+        },
+        en: {
+          header: "📝 My Note",
+          export: "📂 Export ▼",
+          placeholder: "Write something..."
+        }
+      };
+  
+      async function updateLanguageUI() {
+        const settings = await window.settingAPI.getSettings();
+        const lang = settings.language || "zh";
+        const t = i18n[lang];
+  
+        document.getElementById("header").textContent = t.header;
+        document.getElementById("export-btn").textContent = t.export;
+        document.getElementById("note-area").placeholder = t.placeholder;
+      }
+  
+      updateLanguageUI();
+    </script>
+  </body>
+  
 </html>
 

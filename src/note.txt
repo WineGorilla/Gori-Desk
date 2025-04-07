@@ -1,1 +1,6 @@
 Glad to use GoriDesk!
+
+a = torch.tensor([1, 2, 3])
+b = torch.ones(3)  # all 1
+c = torch.zeros(3)  # all 0
+d = torch.rand(2, 3)  # random

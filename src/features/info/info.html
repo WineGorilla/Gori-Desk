@@ -63,31 +63,32 @@
 </head>
 <body>
   <div class="card">
-    <h2>主人的信息</h2>
-    <label>姓名</label>
+    <h2 id="title-owner">主人的信息</h2>
+    <label id="label-owner-name">姓名</label>
     <input type="text" id="owner-name">
-
-    <label>性别</label>
+    
+    <label id="label-owner-gender">性别</label>
     <select id="owner-gender">
       <option value="">请选择</option>
       <option value="男">男</option>
       <option value="女">女</option>
     </select>
-
-    <label>生日</label>
+    
+    <label id="label-owner-birthday">生日</label>
     <input type="date" id="owner-birthday">
-
-    <h2 style="margin-top:30px;">宠物信息</h2>
-    <label>名字</label>
+    
+    <h2 id="title-pet" style="margin-top:30px;">宠物信息</h2>
+    <label id="label-pet-name">名字</label>
     <input type="text" id="pet-name">
-
-    <label>生日</label>
+    
+    <label id="label-pet-birthday">生日</label>
     <input type="date" id="pet-birthday">
-
-    <label>星座</label>
+    
+    <label id="label-pet-zodiac">星座</label>
     <input type="text" id="pet-zodiac" readonly>
-
+    
     <button id="saveBtn">保存</button>
+    
   </div>
 
   <script src="info.js"></script>

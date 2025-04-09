@@ -1,7 +1,7 @@
 {
   "language": "en",
   "model": "phi",
-  "transparency": 100,
+  "transparency": 99,
   "autoLaunch": false,
   "enableChat": true
 }

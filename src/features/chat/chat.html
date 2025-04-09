@@ -6,7 +6,7 @@
   <title>聊天窗口 - Copilot 风格</title>
   <style>
     body {
-      font-family: 'Segoe UI', Consolas, Monaco, monospace;
+      font-family: "Segoe UI", sans-serif;
       color: #24292f;
       margin: 0;
       padding: 20px;
@@ -15,7 +15,7 @@
     }
 
     .container {
-      width: 100%;
+      width: 80%;
       max-width: 500px;
       background: #f6f8fa;
       border: 1px solid #d0d7de;
@@ -24,10 +24,18 @@
       padding: 16px;
     }
 
+    .header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+
     h4 {
       margin-top: 0px;
       margin-bottom: 1px;
-      color: #0969da;
+      color: #f97316;
     }
 
     hr {
@@ -72,26 +80,31 @@
         display: flex;
         flex-direction: column;
         border: 1px solid #d0d7de;
-        border-radius: 6px;
+        border-radius: 9px;
         padding: 6px;
         background-color: white;
     }
 
     #message {
-        width: 90%;
-        font-family: Consolas, monospace;
-        resize: none;
-        overflow-y: auto;
-        border: none;
-        outline: none;
-        background-color: transparent;
-        padding: 8px;
-        line-height: 1.4;
-        font-size: 14px;
-        min-height: 50px;
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-    }
+  width: 90%;
+  font-family: Consolas, monospace;
+  resize: none;
+  overflow-y: auto;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  padding: 4px 8px;
+  line-height: 1.2;
+  font-size: 13px;
+  height: 16px; /* 🎯 重点！直接设置精确高度 */
+  max-height: 60px;
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* IE & Edge */
+}
+#message::-webkit-scrollbar {
+  display: none;                /* Chrome & Safari */
+}
+
 
     .functionBox {
         display: flex;
@@ -102,8 +115,9 @@
 
 
     button {
+        font-size:8px,
         padding: 6px 10px;
-        background-color: #0969da;
+        background-color: #f97316;
         color: white;
         border: none;
         border-radius: 6px;
@@ -112,13 +126,12 @@
     }
 
     button:hover {
-        background-color: #055fb5;
+        background-color:#ea580c;
     }
 
     .input-row:focus-within {
-        border: 1px solid #0969da;
-        background-color: white;
-        box-shadow: 0 0 0 2px rgba(9,105,218,0.2);
+      border: 1px solid #f97316;
+      box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
     }
 
     .close-btn {
@@ -126,24 +139,68 @@
   cursor: pointer;
   font-weight: bold;
   font-size: 18px;
+  color: #666;
 }
 .close-btn:hover {
-  color: red;
+  color: #f97316;
 }
+
+
+.msg {
+  display: flex;
+  margin: 5px 0;
+  font-size: 14px;
+  word-break: break-word;
+}
+
+.msg.ai {
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.msg.user {
+  justify-content: flex-end;
+}
+
+.msg .avatar {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+  margin-top: 2px;
+  border-radius: 50%;
+}
+
+.msg .bubble {
+  max-width: 80%;
+  padding: 8px 12px;
+  background: #e6edf3;
+  border-radius: 10px;
+  white-space: pre-wrap;
+  line-height: 1.4;
+  color: #24292f;
+  font-family: Consolas, monospace;
+}
+
+.msg.user .bubble {
+  background: #d1d5db;
+  color: #333;
+}
+
 
   </style>
 </head>
 <body>
   <div class="container">
-    <h4>💬GoriDesk</h4>
-    <div class="close-btn" onclick="closeChat()" title="关闭">x</div>
+    <div class="header-row">
+      <h4>💬GoriDesk</h4>
+      <div class="close-btn" onclick="closeChat()" title="关闭">x</div>
+    </div>    
     <hr>
     <div id="chat-box"></div>
     <div class="input-row">
       <textarea id="message" placeholder="..." rows="2"></textarea>
       <div class="functionBox">
-        <button>图片</button>
-        <button onclick="sendMessage()">发送</button>
+        <button onclick="sendMessage()">></button>
       </div>
     </div>
   </div>
@@ -151,28 +208,53 @@
   <script>
 // renderer.js
 async function sendMessage() {
-    const chatBox = document.getElementById('chat-box');
-    const messageInput = document.getElementById('message');
-    const userText = messageInput.value.trim();
-    if (!userText) return;
+  const chatBox = document.getElementById('chat-box');
+  const messageInput = document.getElementById('message');
+  const userText = messageInput.value.trim();
+  if (!userText) return;
 
-    // 用户消息
-    const userMsg = document.createElement('p');
-    userMsg.textContent = `> ${userText}`;
-    chatBox.appendChild(userMsg);
-    chatBox.scrollTop = chatBox.scrollHeight;
-    messageInput.value = "";
+  // ➤ 用户消息（右侧气泡）
+  const userDiv = document.createElement('div');
+  userDiv.classList.add('msg', 'user');
 
-    // AI 回复
-    const aiReply = await window.chatAI.sendMessage(userText);
-    const aiMsg = document.createElement('p');
-    aiMsg.textContent = aiReply;
-    chatBox.appendChild(aiMsg);
-    chatBox.scrollTop = chatBox.scrollHeight;
+  const userBubble = document.createElement('div');
+  userBubble.classList.add('bubble');
+  userBubble.textContent = userText;
+
+  userDiv.appendChild(userBubble);
+  chatBox.appendChild(userDiv);
+  chatBox.scrollTop = chatBox.scrollHeight;
+  messageInput.value = "";
+
+  // ➤ 添加“AI 正在输入...”提示
+  const loadingDiv = document.createElement('div');
+  loadingDiv.classList.add('msg', 'ai');
+  loadingDiv.setAttribute('id', 'loading-msg');
+
+  const avatar = document.createElement('img');
+  avatar.classList.add('avatar');
+  avatar.src = '../../assets/icon/me.png';
+
+  const loadingBubble = document.createElement('div');
+  loadingBubble.classList.add('bubble');
+  loadingBubble.textContent = 'Loading';
+
+  loadingDiv.appendChild(avatar);
+  loadingDiv.appendChild(loadingBubble);
+  chatBox.appendChild(loadingDiv);
+  chatBox.scrollTop = chatBox.scrollHeight;
+
+  // ➤ 获取 AI 回复
+  const aiReply = await window.chatAI.sendMessage(userText);
+
+  // ➤ 替换 loading 为正式回复
+  loadingBubble.textContent = aiReply;
+  loadingDiv.removeAttribute('id');
 }
 
+
 function closeChat() {
-  window.chatAPI.notifyClose(); // 让主进程做所有事
+  window.chatAI.notifyClose(); // 让主进程做所有事
 }
 
   </script>

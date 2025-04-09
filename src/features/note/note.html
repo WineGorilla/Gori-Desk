@@ -8,10 +8,11 @@
         body {
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: "Segoe UI", sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
+            color: #666;
         }
 
         /* 顶部工具栏 */
@@ -108,6 +109,7 @@
 
         /* 文本框 */
         textarea {
+            font-family: "Segoe UI", sans-serif;
             width: 100%;
             height: 70vh;
             font-size: 16px;
@@ -147,11 +149,11 @@
     <div class="toolbar">
       <!-- 子窗口HTML顶部 -->
       <div class="window-header">
-        <span id="header">📝 My Note</span>
-        <button class="close-btn">❌</button>
+        <span id="header">My Note</span>
+        <button class="close-btn">x</button>
       </div>
       <div class="export-container">
-        <button id="export-btn" class="export-btn">📂 Import ▼</button>
+        <button id="export-btn" class="export-btn">Import ▼</button>
         <div class="dropdown">
           <button id="exportTxt">📄 TXT</button>
           <button id="exportMd">📄 MD</button>

@@ -530,11 +530,12 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
   ipcMain.on("chat-window-close", () => {
     stopFlask(); // 停止 Flask
   
-    if (chatWindow && !chatWindow.isDestroyed()) {
-      chatWindow.close(); // 主进程关闭窗口
-      chatWindow = null;
+    if (childWindows["chat"] && !childWindows["chat"].isDestroyed()) {
+      childWindows["chat"].close();
+      childWindows["chat"] = null;
     }
   });
+  
   
   
 

@@ -1,28 +1,34 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     const functionsContainer = document.querySelector(".functions");
     const petImage = document.querySelector(".petImage");
-    const originalSrc = "../assets/Monkey.png"
-    const comfortGif = "../assets/comfort.gif"
-    const PET_EXHAUSTED_SRC = "../assets/exhausted.gif";
-    const Imagecontainer = document.querySelector(".petImageContainer");
-    const draggingGif = "../assets/struggle.gif";
 
-    // 点击按钮后隐藏圆点（使用 class 替代 visibility）
-    document.querySelectorAll(".functions div").forEach(dot => {
-        dot.addEventListener("click", () => {
-            console.log("圆点被点击，隐藏");
-            functionsContainer.classList.add("hidden");
-        });
-    });
+    let originalSrc;
+    let gifMap = {};
 
-    // 鼠标移入图片时显示圆点
+    // ✅ 加载所有动作图像路径（如果有自定义优先）
+    async function loadPetGifs() {
+        const fallback = (local) => `../assets/${local}`;
+        gifMap = {
+            idle: await window.petAPI.getCustomGifPath("idle") || fallback("Monkey.png"),
+            comfort: await window.petAPI.getCustomGifPath("comfort") || fallback("comfort.gif"),
+            struggle: await window.petAPI.getCustomGifPath("struggle") || fallback("struggle.gif"),
+            exhausted: await window.petAPI.getCustomGifPath("exhausted") || fallback("exhausted.gif")
+        };
+        originalSrc = gifMap.idle;
+        petImage.src = originalSrc;
+    }
+
+    await loadPetGifs();
+
+    // 🟢 鼠标进入显示功能按钮
     petImage.addEventListener("mouseenter", () => {
         functionsContainer.classList.remove("hidden");
-      });
-      
+    });
+
+    // 🔵 点击宠物播放 comfort 动画
     petImage.addEventListener("click", () => {
-        if (petImage.src.includes("gif")) return; // 避免连续播放
-        petImage.src = comfortGif;
+        if (petImage.src.includes("gif")) return;
+        petImage.src = gifMap.comfort;
         petImage.classList.add("gif-size");
 
         setTimeout(() => {
@@ -31,21 +37,28 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 2500);
     });
 
+    // 🔘 点击按钮后隐藏圆点
+    document.querySelectorAll(".functions img").forEach(dot => {
+        dot.addEventListener("click", () => {
+            functionsContainer.classList.add("hidden");
+        });
+    });
+
+    // 🟥 拖动状态动画（通过外部 window.dragAPI 控制）
     window.dragAPI.onDragStart(() => {
-        if (isExhaustedPlaying === true) return; 
-        petImage.src = draggingGif;
+        if (isExhaustedPlaying === true) return;
+        petImage.src = gifMap.struggle;
         petImage.classList.add("gif-size");
-      });
-    
-      window.dragAPI.onDragEnd(() => {
-        if (isExhaustedPlaying === false){
+    });
+
+    window.dragAPI.onDragEnd(() => {
+        if (isExhaustedPlaying === false) {
             petImage.src = originalSrc;
             petImage.classList.remove("gif-size");
+        } else {
+            petImage.src = gifMap.exhausted;
         }
-        else{
-            petImage.src = PET_EXHAUSTED_SRC;
-        }
-      });
+    });
 
     // 功能按钮绑定事件
     document.querySelector(".record").addEventListener("click", () => {
@@ -61,6 +74,8 @@ document.addEventListener("DOMContentLoaded", () => {
         window.myAPI.openNote();
     });
 });
+
+
 
 
 

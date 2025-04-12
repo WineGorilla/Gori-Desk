@@ -25,6 +25,7 @@
             align-items: center;
             padding: 12px 15px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            color:orange;
             border-bottom: 1px solid #ddd;
             border-radius: 10px 10px 0 0;
             margin-top: 20px;
@@ -35,6 +36,7 @@
             font-size: 16px;
             cursor: pointer;
             -webkit-app-region: no-drag; /* 保证点击有效 */
+            color:red;
         }
 
 .close-btn:hover {
@@ -59,6 +61,7 @@
             cursor: pointer;
             transition: 0.2s;
             font-size: 14px;
+
         }
 
         /* 按钮悬浮效果 */
@@ -142,6 +145,9 @@
         textarea::-webkit-scrollbar-track {
             background: transparent;
         }
+        #header{
+          color:orange;
+        }
     </style>
 </head>
 <body>
@@ -150,7 +156,7 @@
       <!-- 子窗口HTML顶部 -->
       <div class="window-header">
         <span id="header">My Note</span>
-        <button class="close-btn">x</button>
+        <button class="close-btn">X</button>
       </div>
       <div class="export-container">
         <button id="export-btn" class="export-btn">Import ▼</button>
@@ -170,13 +176,13 @@
     <script>
       const i18n = {
         zh: {
-          header: "📝 笔记",
-          export: "📂 导出 ▼",
+          header: "笔记",
+          export: "导出 ▼",
           placeholder: "写点什么吧..."
         },
         en: {
-          header: "📝 My Note",
-          export: "📂 Export ▼",
+          header: "My Note",
+          export: "Export ▼",
           placeholder: "Write something..."
         }
       };

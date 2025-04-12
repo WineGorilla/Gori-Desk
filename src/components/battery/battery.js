@@ -1,56 +1,48 @@
 const MAX_ENERGY = 100;
 const MIN_ENERGY = 10;
 const EXHAUSTED_THRESHOLD = 20;
-const EXHAUSTED_REFRESH_INTERVAL = 3000; //每隔多久刷新虚弱状态
-const ANIMATION_DURATION = 2500; //吃东西动画时间
+const ANIMATION_DURATION = 2500;
+const ENERGY_DECAY_INTERVAL = 10000;
 
-let petEnergy = MAX_ENERGY; 
-let isExhaustedPlaying = false; //是否处于虚弱状态
+let petEnergy = MAX_ENERGY;
+let isExhaustedPlaying = false;
 let exhaustedInterval = null;
+window.isExhaustedPlaying = false;
 
 const petImg = document.querySelector(".petImage");
 const energyText = document.getElementById("pet-energy");
 const batteryLevel = document.getElementById("battery-level");
 
-const gifMap = {
-  banana: "../assets/banana.gif",
-  cola: "../assets/cola.gif",
-  yogurt: "../assets/yogurt.gif"
-};
+let gifMap = {};
 
-const PET_NORMAL_SRC = "../assets/Monkey.png";
-const PET_EXHAUSTED_SRC = "../assets/exhausted.gif";
+async function loadPetGifs() {
+  const fallback = (name) => `../assets/${name}`;
+  gifMap = {
+    banana: await window.petAPI.getCustomGifPath("eatA") || fallback("banana.gif"),
+    cola: await window.petAPI.getCustomGifPath("eatB") || fallback("cola.gif"),
+    yogurt: await window.petAPI.getCustomGifPath("eatC") || fallback("yogurt.gif"),
+    normal: await window.petAPI.getCustomGifPath("idle") || fallback("Monkey.png"),
+    exhausted: await window.petAPI.getCustomGifPath("struggle") || fallback("exhausted.gif")
+  };
+}
 
-// ----------------- UI 更新 ------------------
 function updateEnergyUI() {
   if (!energyText || !batteryLevel) return;
-
   energyText.textContent = petEnergy;
-
-  const energyPercent = (petEnergy / MAX_ENERGY) * 100;
-  batteryLevel.style.height = `${energyPercent}%`;
-
+  const percent = (petEnergy / MAX_ENERGY) * 100;
+  batteryLevel.style.height = `${percent}%`;
   batteryLevel.style.background =
     petEnergy >= 70 ? "limegreen" :
     petEnergy >= 30 ? "orange" : "red";
-
   updateExhaustedState();
 }
 
 function updateExhaustedState() {
-    const shouldExhaust = petEnergy <= EXHAUSTED_THRESHOLD;
-  
-    if (shouldExhaust) {
-      if (!isExhaustedPlaying) {
-        startExhaustedLoop();
-      } 
-    } else if (isExhaustedPlaying) {
-      stopExhaustedLoop();
-    }
-  }
-  
+  const shouldExhaust = petEnergy <= EXHAUSTED_THRESHOLD;
+  if (shouldExhaust && !isExhaustedPlaying) startExhaustedLoop();
+  else if (!shouldExhaust && isExhaustedPlaying) stopExhaustedLoop();
+}
 
-// ----------------- 能量变化 ------------------
 function increaseEnergy(amount, foodType = "banana") {
   petEnergy = Math.min(MAX_ENERGY, petEnergy + amount);
   updateEnergyUI();
@@ -62,59 +54,47 @@ function decreaseEnergy() {
   updateEnergyUI();
 }
 
-// ----------------- 动画控制 ------------------
 function playEatingAnimation(foodType) {
-    if (!petImg) return;
-  
-    const gifSrc = gifMap[foodType] || gifMap["banana"];
-    if (petImg.src.endsWith(gifSrc)) return;
-  
-    petImg.src = gifSrc;
-    petImg.classList.add("gif-size");
-  
-    setTimeout(() => {
-      if (isExhaustedPlaying) {
-        petImg.src = PET_EXHAUSTED_SRC;
-      } else {
-        petImg.src = PET_NORMAL_SRC;
-        petImg.classList.remove("gif-size");
-      }
-    }, ANIMATION_DURATION);
-  }
-  
-  function startExhaustedLoop() {
-    if (!petImg) return;
-    isExhaustedPlaying = true;
-    window.isExhaustedPlaying = true;
-    petImg.src = PET_EXHAUSTED_SRC;
-    petImg.classList.add("gif-size")
-  }
-  
-  function stopExhaustedLoop() {
-    isExhaustedPlaying = false;
-    window.isExhaustedPlaying = false;
-  
-    if (petImg) {
-      petImg.classList.remove("gif-size");
-      petImg.src = PET_NORMAL_SRC;
-    }
-  }
+  if (!petImg) return;
+  const gifSrc = gifMap[foodType] || gifMap["banana"];
+  petImg.src = gifSrc;
+  petImg.classList.add("gif-size");
+  setTimeout(() => {
+    petImg.src = isExhaustedPlaying ? gifMap.exhausted : gifMap.normal;
+    petImg.classList.remove("gif-size");
+  }, ANIMATION_DURATION);
+}
 
+function startExhaustedLoop() {
+  isExhaustedPlaying = true;
+  window.isExhaustedPlaying = true;
+  petImg.src = gifMap.exhausted;
+  petImg.classList.add("gif-size");
+}
 
-// ----------------- 事件监听 ------------------
-document.addEventListener("click", (event) => {
-  if (event.target.classList.contains("circle")) {
-    increaseEnergy(10);
-  }
+function stopExhaustedLoop() {
+  isExhaustedPlaying = false;
+  window.isExhaustedPlaying = false;
+  petImg.classList.remove("gif-size");
+  petImg.src = gifMap.normal;
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await loadPetGifs();
+  petImg.src = gifMap.normal;
+  updateEnergyUI();
+});
+
+document.addEventListener("click", (e) => {
+  if (e.target.classList.contains("circle")) increaseEnergy(10);
 });
 
 window.eatAPI?.onEnergyUpdate((energy, foodType) => {
   increaseEnergy(energy, foodType);
 });
 
+setInterval(decreaseEnergy, ENERGY_DECAY_INTERVAL);
 
-// ----------------- 定时能量消耗 ------------------
-setInterval(decreaseEnergy, 10000); // 建议调回更合理的时间（如 10 秒减 10）
 
 
 

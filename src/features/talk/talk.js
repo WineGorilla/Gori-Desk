@@ -81,7 +81,7 @@ function startRandomTalking() {
       const type = energy < 30 ? "lowEnergy" : energy > 70 ? "highEnergy" : "default";
       displayTalk(getRandomQuote(type));
     }
-  }, 1500); // 每 15 秒执行一次
+  }, 15000); // 每 15 秒执行一次
 }
 
 // 📌 检查任务并提醒

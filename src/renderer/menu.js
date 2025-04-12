@@ -37,6 +37,10 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("menu-setting").addEventListener("click",()=>{
         window.settingAPI.openSetting();
     })
+    document.getElementById("menu-upload").addEventListener("click",()=>{
+        window.menuAPI.openUpload();
+    })
+
 });
 
 

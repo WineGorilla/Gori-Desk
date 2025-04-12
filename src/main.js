@@ -611,6 +611,104 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
       mainwindow.webContents.send('change-language', lang);
     }
   });
+
+
+  const userDir = path.join(__dirname,"../user");
+  let uploadWindow = null;
+
+  ipcMain.on("open-upload-window", () => {
+    if (uploadWindow && !uploadWindow.isDestroyed()) {
+      uploadWindow.focus();
+      return;
+    }
+  
+    uploadWindow = new BrowserWindow({
+      width: 400,
+      height: 500,
+      title: "上传宠物 GIF",
+      webPreferences: {
+        preload: path.join(__dirname, '../preload.js'),
+        contextIsolation: true,
+        nodeIntegration: false, // ✅ 禁用以确保安全
+        enableRemoteModule: false
+      }
+    });
+    
+  
+    uploadWindow.loadFile(path.join(__dirname, 'features/upload/upload.html'));
+  
+    uploadWindow.on("closed", () => {
+      uploadWindow = null;
+    });
+  });
+  
+  ipcMain.handle("select-gif", async () => {
+    console.log("⚡️ 正在打开文件选择窗口");
+    const result = await dialog.showOpenDialog({
+      title: "选择一个 GIF 文件",
+      filters: [{ name: "Images", extensions: ["gif", "png"] }],
+      properties: ["openFile"]
+    });
+    console.log("📂 选择结果：", result);
+  
+    if (!result.canceled && result.filePaths.length > 0) {
+      return result.filePaths[0];
+    }
+    return null;
+  });
+  
+
+  ipcMain.on("upload-gif", ({ sender }, { action, filePath }) => {
+    const targetDir = path.join(userDir, action);
+  
+    if (!fs.existsSync(targetDir)) {
+      fs.mkdirSync(targetDir, { recursive: true });
+    }
+  
+    // 删除旧文件
+    fs.readdirSync(targetDir).forEach(file => {
+      fs.unlinkSync(path.join(targetDir, file));
+    });
+  
+    // ✅ 获取真实扩展名
+    const ext = path.extname(filePath); // 例如 .gif 或 .png
+    const destPath = path.join(targetDir, "pet" + ext);
+  
+    fs.copyFileSync(filePath, destPath);
+    console.log(`✅ ${action} 文件已替换: ${destPath}`);
+  });
+
+  ipcMain.handle("get-pet-image", (_event, action) => {
+    const gifPath = path.join(__dirname, "./user", action, "pet.gif");
+    const pngPath = path.join(__dirname, "./user", action, "pet.png");
+    const fallback = path.join(__dirname, "./assets", "Monkey.png");
+  
+    if (fs.existsSync(gifPath)) return "file://" + gifPath;
+    if (fs.existsSync(pngPath)) return "file://" + pngPath;
+    return "file://" + fallback;
+  });
+
+  ipcMain.handle("get-custom-gif-path", (_event, action = "idle") => {
+    const dirPath = path.join(app.getAppPath(), "user", action);
+
+    if (!fs.existsSync(dirPath)) return null;
+
+    const files = fs.readdirSync(dirPath);
+    const gif = files.find(f => f.endsWith(".gif") || f.endsWith(".png"));
+    if (gif) {
+        return "file://" + path.join(dirPath, gif).replace(/\\/g, "/");
+    }
+
+    return null;
+});
+  
+  
+
+
+
+
+
+
   
   
   

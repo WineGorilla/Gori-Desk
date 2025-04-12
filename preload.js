@@ -36,7 +36,8 @@ contextBridge.exposeInMainWorld("noteAPI", {
 
 contextBridge.exposeInMainWorld("menuAPI", {
     exitApp: () => ipcRenderer.send("exit-app"),
-    openInfo:()=>ipcRenderer.send("open-info")
+    openInfo:()=>ipcRenderer.send("open-info"),
+    openUpload:()=>{ipcRenderer.send("open-upload-window")}
 });
 
 contextBridge.exposeInMainWorld("talkAPI", {
@@ -73,6 +74,19 @@ contextBridge.exposeInMainWorld("talkAPI", {
   
     changeLanguage: (lang) => ipcRenderer.send('change-language', lang)
   });
+
+  contextBridge.exposeInMainWorld("gifAPI", {
+    uploadGIF: (action, filePath) => ipcRenderer.send("upload-gif", { action, filePath }),
+    selectGifFile: () => ipcRenderer.invoke("select-gif") // 🆕 加这个
+  });
+
+contextBridge.exposeInMainWorld("petAPI", {
+  getPetImage: (action) => ipcRenderer.invoke("get-pet-image", action),
+  getCustomGifPath: (action) => ipcRenderer.invoke("get-custom-gif-path", action)
+});
+
+
+  
   
   
 

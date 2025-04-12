@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>上传宠物 GIF</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      padding: 20px;
+    }
+    select, input[type="file"] {
+      margin: 10px 0;
+      width: 100%;
+    }
+    button {
+      padding: 8px 16px;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    img {
+      max-width: 100px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>上传你的宠物 GIF</h2>
+
+  <label for="action">选择动作:</label>
+  <select id="action">
+    <option value="idle">默认</option>
+    <option value="struggle">挣扎</option>
+    <option value="eatA">食物A</option>
+    <option value="eatB">食物B sleep</option>
+    <option value="eatC">食物C happy</option>
+    <option value="hungry">饿</option>
+    <option value="comfort">comfort</option>
+  </select>
+
+  <button onclick="selectAndUpload()">选择并上传 GIF</button>
+
+  <p id="status"></p>
+  <img id="preview" src="" alt="预览图" />
+
+  <script>
+async function selectAndUpload() {
+  const status = document.getElementById("status");
+  const preview = document.getElementById("preview");
+
+  try {
+    const filePath = await window.gifAPI?.selectGifFile();
+
+    if (!filePath) {
+      status.textContent = "❌ 你取消了文件选择";
+      return;
+    }
+
+    status.textContent = "✅ 选择的路径是：" + filePath;
+
+    // 🟡 读取本地图片作为预览（base64）
+    const reader = new FileReader();
+    reader.onload = () => {
+      preview.src = reader.result;
+    };
+
+    // 使用 input[type=file] 也可以拿到 File 对象，但我们是用 Electron 的路径
+    // 所以这里用 fetch 读取文件再转成 blob
+    const response = await fetch("file://" + filePath);
+    const blob = await response.blob();
+    reader.readAsDataURL(blob);
+
+    // 🟢 发送给主进程复制
+    const action = document.getElementById("action").value;
+    window.gifAPI.uploadGIF(action, filePath);
+
+  } catch (err) {
+    status.textContent = "❌ 错误：" + err.message;
+    console.error(err);
+  }
+}
+
+
+  </script>
+</body>
+</html>
+

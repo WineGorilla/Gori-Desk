@@ -1,33 +1,32 @@
-const quotes = {
-  zh: {
-    default: [
+{
+  "zh": {
+    "default": [
       "你好呀！今天又是元气满满的一天！",
       "陪陪我吧，我有点无聊了～",
       "你在做什么呢？我好想知道！"
     ],
-    lowEnergy: [
+    "lowEnergy": [
       "我好累啊...能给我点吃的吗？",
       "精力快耗尽了，再不喂我我可要晕倒啦～"
     ],
-    highEnergy: [
+    "highEnergy": [
       "我现在超有劲！快带我玩吧！",
       "嗨嗨嗨～动起来动起来～"
     ]
   },
-  en: {
-    default: [
+  "en": {
+    "default": [
       "Hi there! It's a brand new day!",
       "Stay with me~ I'm a bit bored.",
       "What are you doing? I want to know!"
     ],
-    lowEnergy: [
+    "lowEnergy": [
       "I'm so tired... Can I have something to eat?",
       "My energy is low... I'm going to faint if you don't feed me!"
     ],
-    highEnergy: [
+    "highEnergy": [
       "I'm full of energy! Let's play!",
       "Yooo! Time to move!"
     ]
   }
-};
-  
+}

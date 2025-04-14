@@ -4,118 +4,229 @@
   <meta charset="UTF-8">
   <title>设置</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
+      margin: 0;
       font-family: "Segoe UI", sans-serif;
-      padding: 20px;
+      display: flex;
       background-color: #f4f4f4;
       color: #333;
+      font:12px;
+    }
+    .sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 180px;
+  height: 100vh;
+  background-color: #ffffff;
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.03);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 40px;
+  gap: 10px;
+  color: #333;
+}
+
+.iconImg {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 12px;
+  border: none;
+  background-color: transparent;
+  color: #444;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+  background-color: #f2f2f2;
+}
+
+.nav-btn.active {
+  background-color: #e0f2ff;
+  color: #007acc;
+  font-weight: 600;
+}
+
+
+
+
+
+    .main{
+      margin-left:280px;
     }
 
-    h2 {
-      margin-top: 30px;
-      color: #444;
-    }
+
+
 
     .setting-group {
-      margin-bottom: 20px;
-      padding: 15px;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
 
-    label {
-      display: block;
-      margin-bottom: 10px;
-    }
+.inline-row {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
 
-    select, input[type="range"] {
-      width: 100%;
-      padding: 5px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
+.inline-row label {
+  min-width: 140px;
+  font-weight: 500;
+}
 
-    .switch {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 10px;
-    }
+.inline-row select,
+.inline-row input[type="range"] {
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
 
-    .switch input {
-      width: auto;
-    }
+/* 独立下拉框样式（未嵌套 inline-row 的） */
+.setting-group > label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #444;
+}
 
-    #saveBtn {
-      width: 100%;
-      padding: 10px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-      margin-top: 20px;
-    }
+.setting-group > select {
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
 
-    #saveBtn:hover {
-      background-color: #45a049;
-    }
+/* Switch 样式优化 */
+.switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 0;
+}
+
+.switch label {
+  font-weight: 500;
+}
+
+/* 保存按钮样式 */
+#saveBtn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+#saveBtn:hover {
+  background-color: #45a049;
+}
+
+
+
+  
+
   </style>
 </head>
 <body>
+  <!-- 左侧导航栏 -->
+  <aside class="sidebar">
+    <div class="logo"><img class="iconImg" src="../../assets/icon/goriicon.png"> <span>GoriDesk</span></div>
+    <nav>
+      <button class="nav-btn" onclick="window.menuAPI.openInfo()">📄 资料</button>
+      <button class="nav-btn">⚙️ 基础设置</button>
+      <button class="nav-btn">🌐 自定义</button>
+    </nav>
+  </aside>
 
-    <!-- 加一个加载提示 -->
-    <div id="loading" style="text-align:center; margin-top: 100px;">正在加载设置中...</div>
-  
-    <!-- 主内容区域：初始隐藏，加载完后显示 -->
+  <!-- 右侧设置区域 -->
+  <div class="main">
+    <div id="loading">正在加载设置中...</div>
+
     <div id="mainUI" style="display: none;">
-  
-      <h1 id="titleText">设置 Settings</h1>
-  
+      <h3 id="titleText">设置 Settings</h3>
+
       <div class="setting-group">
-        <h2 id="langTitle">🌐 语言 Language</h2>
-        <label for="languageSelect" id="langLabel">选择语言 / Select Language:</label>
-        <select id="languageSelect">
-          <option value="zh">中文</option>
-          <option value="en">English</option>
-        </select>
+        <div class="inline-row">
+          <label for="languageSelect" id="langLabel">选择语言 / Select Language:</label>
+          <select id="languageSelect">
+            <option value="zh">中文</option>
+            <option value="en">English</option>
+          </select>
+        </div>
       </div>
-  
+
       <div class="setting-group">
-        <h2 id="modelTitle">🤖 模型选择 AI Model</h2>
         <label for="modelSelect" id="modelLabel">选择大语言模型:</label>
         <select id="modelSelect">
           <option value="phi">RWKV</option>
           <option value="ollama">Ollama</option>
         </select>
       </div>
-  
+
       <div class="setting-group">
-        <h2 id="transTitle">🌫️ 桌宠透明度 Transparency</h2>
+        <div class="inline-row">
         <label for="transparencyRange" id="transLabel">透明度 (0% ~ 100%):</label>
         <input type="range" id="transparencyRange" min="20" max="100" step="1">
+        </div>
       </div>
-  
+
       <div class="setting-group">
-        <h2 id="startupTitle">⚙️ 启动项 Startup</h2>
         <div class="switch">
           <label for="autoLaunch" id="autoLaunchLabel">开机自启:</label>
           <input type="checkbox" id="autoLaunch">
         </div>
       </div>
-  
+
       <div class="setting-group">
-        <h2 id="chatTitle">💬 对话功能 Chat</h2>
         <div class="switch">
           <label for="enableChat" id="chatLabel">启用对话:</label>
           <input type="checkbox" id="enableChat">
         </div>
       </div>
-  
+
       <button id="saveBtn">保存设置 / Save Settings</button>
     </div>
+  </div>
 
 <script>
 // setting.js
@@ -123,30 +234,20 @@
 // 🌐 多语言字典配置
 const i18n = {
   zh: {
-    title: "设置",
-    language: "🌐 语言 Language",
-    selectLanguage: "选择语言 / Select Language:",
-    modelTitle: "🤖 模型选择 AI Model",
+    title: "基础设置",
+    selectLanguage: "选择语言",
     selectModel: "选择大语言模型:",
-    transparencyTitle: "🌫️ 桌宠透明度 Transparency",
-    transparencyLabel: "透明度 (0% ~ 100%):",
-    startupTitle: "⚙️ 启动项 Startup",
+    transparencyLabel: "透明度",
     autoLaunch: "开机自启:",
-    chatTitle: "💬 对话功能 Chat",
     enableChat: "启用对话:",
     save: "保存设置"
   },
   en: {
     title: "Settings",
-    language: "🌐 Language",
     selectLanguage: "Choose Language:",
-    modelTitle: "🤖 AI Model Selection",
     selectModel: "Choose AI Model:",
-    transparencyTitle: "🌫️ Pet Transparency",
     transparencyLabel: "Transparency (0% ~ 100%):",
-    startupTitle: "⚙️ Startup",
     autoLaunch: "Auto Launch:",
-    chatTitle: "💬 Chat Feature",
     enableChat: "Enable Chat:",
     save: "Save Settings"
   }
@@ -158,15 +259,10 @@ function updateLanguage(lang) {
 
   document.title = t.title;
   document.getElementById("titleText").textContent = t.title;
-  document.getElementById("langTitle").textContent = t.language;
   document.getElementById("langLabel").textContent = t.selectLanguage;
-  document.getElementById("modelTitle").textContent = t.modelTitle;
   document.getElementById("modelLabel").textContent = t.selectModel;
-  document.getElementById("transTitle").textContent = t.transparencyTitle;
   document.getElementById("transLabel").textContent = t.transparencyLabel;
-  document.getElementById("startupTitle").textContent = t.startupTitle;
   document.getElementById("autoLaunchLabel").textContent = t.autoLaunch;
-  document.getElementById("chatTitle").textContent = t.chatTitle;
   document.getElementById("chatLabel").textContent = t.enableChat;
   document.getElementById("saveBtn").textContent = t.save;
 }

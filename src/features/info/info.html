@@ -4,91 +4,255 @@
   <meta charset="UTF-8">
   <title>个人信息</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      font-family: -apple-system, "Segoe UI", sans-serif;
-      background: #f4f4f4;
+      font-family: "Segoe UI", sans-serif;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    .card {
-      background: #ffffff;
-      padding: 20px 25px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      width: 350px;
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-
-    .card h2 {
-      margin-bottom: 15px;
-      font-size: 20px;
+      background-color: #f4f4f4;
       color: #333;
+      font:12px;
     }
+    .sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 180px;
+  height: 100vh;
+  background-color: #ffffff;
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.03);
+}
 
-    label {
-      font-size: 14px;
-      display: block;
-      margin-top: 12px;
-    }
+.logo {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 40px;
+  gap: 10px;
+  color: #333;
+}
 
-    input, select {
-      width: 100%;
-      padding: 6px 10px;
-      font-size: 14px;
-      margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
+.iconImg {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
 
-    #saveBtn {
-      margin-top: 20px;
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      width: 100%;
-    }
+nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
-    #saveBtn:hover {
-      background: #0056b3;
-    }
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 12px;
+  border: none;
+  background-color: transparent;
+  color: #444;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+  background-color: #f2f2f2;
+}
+
+.nav-btn.active {
+  background-color: #e0f2ff;
+  color: #007acc;
+  font-weight: 600;
+}
+.card {
+  margin-left: 200px;
+
+  padding: 30px;
+
+  border-radius: 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  height: 100vh;
+}
+
+/* 主人信息部分 */
+.user {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.user-basic {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+#title-owner {
+  font-size: 16px;
+  margin-right: 10px;
+  min-width: 90px;
+}
+
+/* 单独一行生日字段，缩进对齐 */
+#label-owner-birthday {
+  margin-left: 112px;
+  margin-top: 10px;
+  display: inline-block;
+}
+#owner-birthday {
+  margin-left: 8px;
+}
+
+/* 宠物信息部分 */
+.pet {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pet-row {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+  gap: 20px;
+  overflow-x: auto;
+}
+
+#title-pet {
+  font-size: 16px;
+  margin-right: 10px;
+  min-width: 82px;
+  margin-top: 0px;
+}
+
+/* 每个字段 label+input 组合 */
+.form-item {
+  display: flex;
+  flex-direction: column;
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.form-item label {
+  font-weight: 500;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.form-item input {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  width: 80px;
+}
+
+#pet-birthday{
+  width:100px;
+}
+
+/* 通用 label + input 样式 */
+label {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+input,
+select {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  width: 100px;
+}
+
+/* 保存按钮 */
+#saveBtn {
+  align-self: flex-start;
+  padding: 10px 16px;
+  font-size: 14px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-left:352px;
+}
+
+#saveBtn:hover {
+  background-color: #45a049;
+}
+
   </style>
 </head>
 <body>
+  <aside class="sidebar">
+    <div class="logo"><img class="iconImg" src="../../assets/icon/goriicon.png"> <span>GoriDesk</span></div>
+    <nav>
+      <button class="nav-btn" onclick="window.menuAPI.openInfo()">📄 资料</button>
+      <button class="nav-btn">⚙️ 基础设置</button>
+      <button class="nav-btn">🌐 自定义</button>
+    </nav>
+  </aside>
   <div class="card">
-    <h2 id="title-owner">主人的信息</h2>
-    <label id="label-owner-name">姓名</label>
-    <input type="text" id="owner-name">
+    <div class="user">
+
+      <div id="users">
+        <div class="user-basic">
+          <h2 id="title-owner">主人的信息</h2>
+          <label id="label-owner-name">姓名</label>
+          <input type="text" id="owner-name">
     
-    <label id="label-owner-gender">性别</label>
-    <select id="owner-gender">
-      <option value="">请选择</option>
-      <option value="男">男</option>
-      <option value="女">女</option>
-    </select>
+          <label id="label-owner-gender">性别</label>
+          <select id="owner-gender">
+            <option value="">请选择</option>
+            <option value="男">男</option>
+            <option value="女">女</option>
+          </select>
+        </div>
     
-    <label id="label-owner-birthday">生日</label>
-    <input type="date" id="owner-birthday">
+        <label id="label-owner-birthday">生日</label>
+        <input type="date" id="owner-birthday" style="width: auto;">
+      </div>
+    </div>
     
-    <h2 id="title-pet" style="margin-top:30px;">宠物信息</h2>
-    <label id="label-pet-name">名字</label>
-    <input type="text" id="pet-name">
+    <div class="pet">
+      <div class="pet-row">
+        <h2 id="title-pet" style="margin-top:30px;">宠物信息</h2>
+        <div class="form-item">
+          <label id="label-pet-name">名字</label>
+          <input type="text" id="pet-name">
+        </div>
     
-    <label id="label-pet-birthday">生日</label>
-    <input type="date" id="pet-birthday">
-    
-    <label id="label-pet-zodiac">星座</label>
-    <input type="text" id="pet-zodiac" readonly>
-    
+        <div class="form-item">
+          <label id="label-pet-birthday">生日</label>
+          <input type="date" id="pet-birthday">
+        </div>
+
+        <div class="form-item" style="margin-left: 20px;">
+          <label id="label-pet-zodiac">星座</label>
+          <input type="text" id="pet-zodiac" readonly>
+        </div>
+      </div>
     <button id="saveBtn">保存</button>
-    
+  </div>
   </div>
 
   <script src="info.js"></script>

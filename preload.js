@@ -42,7 +42,10 @@ contextBridge.exposeInMainWorld("menuAPI", {
 
 contextBridge.exposeInMainWorld("talkAPI", {
     checkBirthday: () => ipcRenderer.invoke("checkBirthday"),
-    getPendingTasks: () => ipcRenderer.invoke("getPendingTasks")
+    getPendingTasks: () => ipcRenderer.invoke("getPendingTasks"),
+    getQuotes: () => {
+      return ipcRenderer.invoke("get-quotes");
+    }    
   });
 
   contextBridge.exposeInMainWorld("dragAPI", {
@@ -77,14 +80,22 @@ contextBridge.exposeInMainWorld("talkAPI", {
 
   contextBridge.exposeInMainWorld("gifAPI", {
     uploadGIF: (action, filePath) => ipcRenderer.send("upload-gif", { action, filePath }),
-    selectGifFile: () => ipcRenderer.invoke("select-gif") // 🆕 加这个
+    selectGifFile: () => ipcRenderer.invoke("select-gif"),
+    getCurrentImage: (action) => ipcRenderer.invoke("get-current-image", action),
+    resetImage: (action) => ipcRenderer.send("reset-gif", action)
   });
 
 contextBridge.exposeInMainWorld("petAPI", {
   getPetImage: (action) => ipcRenderer.invoke("get-pet-image", action),
-  getCustomGifPath: (action) => ipcRenderer.invoke("get-custom-gif-path", action)
+  getCustomGifPath: (action) => ipcRenderer.invoke("get-custom-gif-path", action),
 });
 
+
+contextBridge.exposeInMainWorld("wholemenuAPI", {
+  openMenuWindow: () => {
+    ipcRenderer.send("open-menu");
+  }
+});
 
   
   

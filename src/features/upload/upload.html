@@ -4,81 +4,331 @@
   <meta charset="UTF-8">
   <title>上传宠物 GIF</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
+      margin: 0;
       font-family: "Segoe UI", sans-serif;
-      padding: 20px;
+      display: flex;
+      background-color: #f4f4f4;
+      color: #333;
+      font:12px;
     }
-    select, input[type="file"] {
-      margin: 10px 0;
-      width: 100%;
+    .sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 180px;
+  height: 100vh;
+  background-color: #ffffff;
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.03);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 40px;
+  gap: 10px;
+  color: #333;
+
+}
+
+.iconImg {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  border: none;
+}
+
+nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 12px;
+  border: none;
+  background-color: transparent;
+  color: #444;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+  background-color: #f2f2f2;
+}
+
+.nav-btn.active {
+  background-color: #e0f2ff;
+  color: #007acc;
+  font-weight: 600;
+}
+
+    .container {
+      margin: auto;
+      padding: 24px;
+      border-radius: 12px;
+      height: 100vh;
     }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .action-block {
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
+      gap: 12px;
+      border-bottom: 1px dashed #ccc;
+      padding-bottom: 10px;
+    }
+
+    .action-block:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
     button {
-      padding: 8px 16px;
-      border: none;
+      padding: 8px 12px;
       background-color: #4CAF50;
       color: white;
+      border: none;
       border-radius: 6px;
       cursor: pointer;
+      font-size: 14px;
     }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
     img {
-      max-width: 100px;
-      margin-top: 10px;
+      width: 120px;
+      height: auto;
+      border: 1px solid #ddd;
+      border-radius: 6px;
     }
+
+    .status {
+      font-size: 13px;
+      color: #888;
+    }
+    #uploadArea {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);  /* 3 列布局 */
+  gap: 20px;
+  margin-left: 200px;
+}
+
+.action-block {
+  background: #fafafa;
+  padding: 16px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+button {
+  padding: 6px 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+button + button {
+  margin-left: 0;
+}
+
+img {
+  width: 100%;
+  max-width: 120px;
+  height: auto;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+.showdiv{
+  display: flex;
+  gap:10px;
+  justify-content: center;
+}
+.status {
+  font-size: 13px;
+  color: #888;
+}
+.button-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-wrap: wrap; /* 可选：避免超出容器自动换行 */
+  margin-top: 6px;
+}
+
+.button-row .status {
+  font-size: 13px;
+  color: #888;
+  white-space: nowrap;
+}
   </style>
 </head>
 <body>
-  <h2>上传你的宠物 GIF</h2>
+  <aside class="sidebar">
+    <div class="logo"><img class="iconImg" src="../../assets/icon/goriicon.png"> <span>GoriDesk</span></div>
+    <nav>
+      <button class="nav-btn" onclick="window.menuAPI.openInfo()">📄 资料</button>
+      <button class="nav-btn">⚙️ 基础设置</button>
+      <button class="nav-btn">🌐 自定义</button>
+    </nav>
+  </aside>
+  <div class="container">
+    <h2>上传你的宠物 GIF / PNG</h2>
 
-  <label for="action">选择动作:</label>
-  <select id="action">
-    <option value="idle">默认</option>
-    <option value="struggle">挣扎</option>
-    <option value="eatA">食物A</option>
-    <option value="eatB">食物B sleep</option>
-    <option value="eatC">食物C happy</option>
-    <option value="hungry">饿</option>
-    <option value="comfort">comfort</option>
-  </select>
-
-  <button onclick="selectAndUpload()">选择并上传 GIF</button>
-
-  <p id="status"></p>
-  <img id="preview" src="" alt="预览图" />
+    <div id="uploadArea"></div>
+  </div>
 
   <script>
-async function selectAndUpload() {
-  const status = document.getElementById("status");
-  const preview = document.getElementById("preview");
+    const actions = [
+      { key: "idle", label: "默认" },
+      { key: "struggle", label: "挣扎" },
+      { key: "eatA", label: "食物A" },
+      { key: "eatB", label: "食物B (sleep)" },
+      { key: "eatC", label: "食物C (happy)" },
+      { key: "hungry", label: "饿" },
+      { key: "comfort", label: "安慰" }
+    ];
 
-  try {
-    const filePath = await window.gifAPI?.selectGifFile();
+    const uploadArea = document.getElementById("uploadArea");
 
-    if (!filePath) {
-      status.textContent = "❌ 你取消了文件选择";
-      return;
+    actions.forEach(action => {
+  const block = document.createElement("div");
+  block.className = "action-block";
+
+  const label = document.createElement("div");
+  label.className = "label";
+  label.textContent = action.label;
+
+  const btn = document.createElement("button");
+  btn.textContent = "上传";
+  btn.onclick = () => selectAndUpload(action.key);
+
+  const status = document.createElement("div");
+  status.className = "status";
+  status.id = `status-${action.key}`;
+
+  const img = document.createElement("img");
+  img.id = `preview-${action.key}`;
+  img.src = ""; // 默认不显示
+
+  const resetBtn = document.createElement("button");
+  resetBtn.textContent = "默认";
+  resetBtn.style.backgroundColor = "#ccc";
+  resetBtn.onclick = async () => {
+    await window.gifAPI.resetImage(action.key);
+    await initPreview(); // 刷新预览
+  };
+  const showdiv = document.createElement("div");
+  showdiv.className = "showdiv";
+
+  block.appendChild(img);
+  block.appendChild(label);
+  block.appendChild(showdiv)
+
+  showdiv.appendChild(btn);
+  showdiv.appendChild(resetBtn);  // ✅ 加在这里
+
+  block.appendChild(status);
+
+
+  uploadArea.appendChild(block);
+});
+
+
+    async function selectAndUpload(action) {
+      const filePath = await window.gifAPI.selectGifFile();
+      const status = document.getElementById("status-" + action);
+      const preview = document.getElementById("preview-" + action);
+
+      if (!filePath) {
+        status.textContent = "❌ 已取消选择";
+        preview.src = "";
+        return;
+      }
+
+      try {
+        const res = await fetch("file://" + filePath);
+        const blob = await res.blob();
+
+        const reader = new FileReader();
+        reader.onload = () => {
+          preview.src = reader.result;
+        };
+        reader.readAsDataURL(blob);
+
+        await window.gifAPI.uploadGIF(action, filePath);
+        status.textContent = "✅ 上传成功！";
+      } catch (err) {
+        status.textContent = "❌ 出错：" + err.message;
+        console.error(err);
+      }
     }
 
-    status.textContent = "✅ 选择的路径是：" + filePath;
+    window.addEventListener("DOMContentLoaded", () => {
+  initPreview(); // 页面加载后立即尝试加载已存在图片
+});
 
-    // 🟡 读取本地图片作为预览（base64）
-    const reader = new FileReader();
-    reader.onload = () => {
-      preview.src = reader.result;
-    };
+async function initPreview() {
+  for (const action of actions) {
+    try {
+      const imgPath = await window.gifAPI.getCurrentImage(action.key);
+      const img = document.getElementById("preview-" + action.key);
+      const status = document.getElementById("status-" + action.key);
 
-    // 使用 input[type=file] 也可以拿到 File 对象，但我们是用 Electron 的路径
-    // 所以这里用 fetch 读取文件再转成 blob
-    const response = await fetch("file://" + filePath);
-    const blob = await response.blob();
-    reader.readAsDataURL(blob);
-
-    // 🟢 发送给主进程复制
-    const action = document.getElementById("action").value;
-    window.gifAPI.uploadGIF(action, filePath);
-
-  } catch (err) {
-    status.textContent = "❌ 错误：" + err.message;
-    console.error(err);
+      if (imgPath && img) {
+        img.src = imgPath;
+        status.innerHTML = `<span style="color:green">✅ 已加载上传图</span>`;
+      } else {
+        status.innerHTML = `<span style="color:orange">🟡 使用默认</span>`;
+      }
+    } catch (err) {
+      console.error("❌ 加载失败：", err);
+    }
   }
 }
 
@@ -86,4 +336,5 @@ async function selectAndUpload() {
   </script>
 </body>
 </html>
+
 

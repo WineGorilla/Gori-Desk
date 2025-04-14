@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   function updateLanguageUI(lang) {
     const i18n = {
       zh: {
-        titleOwner: "主人的信息",
+        titleOwner: "用户信息",
         labelOwnerName: "姓名",
         labelOwnerGender: "性别",
         labelOwnerBirthday: "生日",

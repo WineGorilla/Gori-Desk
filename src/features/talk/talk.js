@@ -1,42 +1,12 @@
 // 🌍 多语言语录配置
-const quotes = {
-  zh: {
-    default: [
-      "你好呀！今天又是元气满满的一天！",
-      "陪陪我吧，我有点无聊了～",
-      "你在做什么呢？我好想知道！"
-    ],
-    lowEnergy: [
-      "我好累啊...能给我点吃的吗？",
-      "精力快耗尽了，再不喂我我可要晕倒啦～"
-    ],
-    highEnergy: [
-      "我现在超有劲！快带我玩吧！",
-      "嗨嗨嗨～动起来动起来～"
-    ]
-  },
-  en: {
-    default: [
-      "Hi there! It's a brand new day!",
-      "Stay with me~ I'm a bit bored.",
-      "What are you doing? I want to know!"
-    ],
-    lowEnergy: [
-      "I'm so tired... Can I have something to eat?",
-      "My energy is low... I'm going to faint if you don't feed me!"
-    ],
-    highEnergy: [
-      "I'm full of energy! Let's play!",
-      "Yooo! Time to move!"
-    ]
-  }
-};
+let quotes = {}
 
 let currentLang = "zh"; // 默认语言
 
 // 🚀 页面加载后初始化
 window.addEventListener("DOMContentLoaded", async () => {
   const settings = await window.settingAPI.getSettings();
+  quotes = await window.talkAPI.getQuotes();
   currentLang = settings.language || "zh";
 
   // ✅ 生日提示（如有）
@@ -81,7 +51,7 @@ function startRandomTalking() {
       const type = energy < 30 ? "lowEnergy" : energy > 70 ? "highEnergy" : "default";
       displayTalk(getRandomQuote(type));
     }
-  }, 15000); // 每 15 秒执行一次
+  }, 1500); 
 }
 
 // 📌 检查任务并提醒

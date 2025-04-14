@@ -5,7 +5,9 @@ const fs = require("fs");
 const RWKV = require("rwkv-cpp-node");
 const {spawn} = require("child_process");
 const { languages } = require("prismjs");
+const { error } = require("console");
 
+let quotesData = {}
 let flaskProcess = null;
 let mainwindow;
 let todoWindow;
@@ -63,6 +65,48 @@ app.whenReady().then(()=>{
     mainwindow.on('closed',()=>{
         mainwindow = null;
     })
+
+    function isValidQuotes(json) {
+      return (
+        json && typeof json === "object" &&
+        Object.keys(json).length > 0 &&
+        Object.values(json).some(group =>
+          typeof group === "object" && Object.keys(group).length > 0
+        )
+      );
+    }
+
+    const defaultPath = path.join(__dirname,"features","talk","quotes.json");
+    const customPath = path.join(__dirname,'../config/quotes.json');
+    try {
+      let jsonRaw = "";
+      let targetPath = "";
+    
+      if (fs.existsSync(customPath)) {
+        jsonRaw = fs.readFileSync(customPath, "utf-8");
+        const parsed = JSON.parse(jsonRaw);
+        if (isValidQuotes(parsed)) {
+          quotesData = parsed;
+          targetPath = customPath;
+        } else {
+          // 如果 custom 存在但为空/无效，回退默认
+          console.warn("⚠️ 自定义 quotes.custom.json 是空的，使用默认 quotes.json");
+          jsonRaw = fs.readFileSync(defaultPath, "utf-8");
+          quotesData = JSON.parse(jsonRaw);
+          targetPath = defaultPath;
+        }
+      } else {
+        jsonRaw = fs.readFileSync(defaultPath, "utf-8");
+        quotesData = JSON.parse(jsonRaw);
+        targetPath = defaultPath;
+      }
+    
+      console.log("✅ 使用语录文件：", path.basename(targetPath));
+    } catch (err) {
+      console.error("❌ 无法加载语录文件：", err);
+      quotesData = {}; // fallback 空对象
+    }
+
 })
 
 app.on("window-all-closed",()=>{
@@ -343,8 +387,8 @@ ipcMain.on("exit-app",()=>{
 
 ipcMain.on("open-info", () => {
     infoWindow = new BrowserWindow({
-        width: 600,
-        height: 600,
+        width: 750,
+        height: 350,
         title: "Info",
         alwaysOnTop: true,
         transparent: true, // 透明背景
@@ -352,12 +396,14 @@ ipcMain.on("open-info", () => {
         backgroundColor: "#00000000", // 确保透明背景
         resizable: true, // 可调整大小
         minimizable: false, // 不允许最小化
+        icon:path.join(__dirname,"assets","icon","goriicon.ico"),
         webPreferences: {
             preload: path.join(__dirname, "../preload.js"),
             contextIsolation: true
         }
     });
-
+    infoWindow.setMenuBarVisibility(false);
+    infoWindow.removeMenu();
     infoWindow.loadFile(path.join(__dirname, "features/info/info.html"));
 
     // 可选：关闭时清除引用
@@ -578,13 +624,14 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
     }
   
     settingWindow = new BrowserWindow({
-      width: 600,
-      height: 600,
+      width: 750,
+      height: 350,
       title: "Settings",
       alwaysOnTop: true,
       transparent: true,
       parent: mainwindow,
       backgroundColor: "#00000000",
+      icon:path.join(__dirname,"assets","icon","goriicon.ico"),
       resizable: true,
       minimizable: false,
       webPreferences: {
@@ -594,6 +641,8 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
     });
   
     settingWindow.loadFile(path.join(__dirname, "features/setting/setting.html"));
+    settingWindow.setMenuBarVisibility(false);
+    settingWindow.removeMenu();
   
     settingWindow.on("closed", () => {
       settingWindow = null;
@@ -623,9 +672,10 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
     }
   
     uploadWindow = new BrowserWindow({
-      width: 400,
-      height: 500,
+      width: 750,
+      height: 350,
       title: "上传宠物 GIF",
+      icon:path.join(__dirname,"assets","icon","goriicon.ico"),
       webPreferences: {
         preload: path.join(__dirname, '../preload.js'),
         contextIsolation: true,
@@ -634,7 +684,8 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
       }
     });
     
-  
+    uploadWindow.setMenuBarVisibility(false);
+    uploadWindow.removeMenu();
     uploadWindow.loadFile(path.join(__dirname, 'features/upload/upload.html'));
   
     uploadWindow.on("closed", () => {
@@ -646,7 +697,7 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
     console.log("⚡️ 正在打开文件选择窗口");
     const result = await dialog.showOpenDialog({
       title: "选择一个 GIF 文件",
-      filters: [{ name: "Images", extensions: ["gif", "png"] }],
+      filters: [{ name: "Images", extensions: ["gif", "png","jpg"] }],
       properties: ["openFile"]
     });
     console.log("📂 选择结果：", result);
@@ -681,27 +732,101 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
   ipcMain.handle("get-pet-image", (_event, action) => {
     const gifPath = path.join(__dirname, "./user", action, "pet.gif");
     const pngPath = path.join(__dirname, "./user", action, "pet.png");
+    const jpgPath = path.join(__dirname, "./user", action, "pet.jpg"); // ✅ 你已声明
     const fallback = path.join(__dirname, "./assets", "Monkey.png");
   
-    if (fs.existsSync(gifPath)) return "file://" + gifPath;
-    if (fs.existsSync(pngPath)) return "file://" + pngPath;
-    return "file://" + fallback;
+    if (fs.existsSync(gifPath)) return "file://" + gifPath.replace(/\\/g, "/");
+    if (fs.existsSync(pngPath)) return "file://" + pngPath.replace(/\\/g, "/");
+    if (fs.existsSync(jpgPath)) return "file://" + jpgPath.replace(/\\/g, "/"); // ✅ 添加这行
+  
+    return "file://" + fallback.replace(/\\/g, "/");
   });
+  
 
   ipcMain.handle("get-custom-gif-path", (_event, action = "idle") => {
     const dirPath = path.join(app.getAppPath(), "user", action);
-
-    if (!fs.existsSync(dirPath)) return null;
-
-    const files = fs.readdirSync(dirPath);
-    const gif = files.find(f => f.endsWith(".gif") || f.endsWith(".png"));
-    if (gif) {
-        return "file://" + path.join(dirPath, gif).replace(/\\/g, "/");
-    }
-
-    return null;
-});
   
+    if (!fs.existsSync(dirPath)) return null;
+  
+    const files = fs.readdirSync(dirPath);
+    const image = files.find(f => /\.(gif|png|jpg)$/i.test(f)); // ✅ 支持 gif/png/jpg
+    if (image) {
+      return "file://" + path.join(dirPath, image).replace(/\\/g, "/");
+    }
+  
+    return null;
+  });
+  
+
+const defaultMap = {
+  idle: "Monkey.png",
+  struggle: "struggle.gif",
+  eatA: "banana.gif",
+  eatB: "cola.gif",
+  eatC: "yogurt.gif",
+  hungry: "exhausted.gif",
+  comfort: "comfort.gif"
+};
+
+ipcMain.handle("get-current-image", (event, action) => {
+  const userPath = path.join(__dirname, "../user", action);
+  const gif = path.join(userPath, "pet.gif");
+  const png = path.join(userPath, "pet.png");
+  const jpg = path.join(userPath, "pet.jpg");
+
+  if (fs.existsSync(gif)) return "file://" + gif;
+  if (fs.existsSync(png)) return "file://" + png;
+  if (fs.existsSync(jpg)) return "file://" + jpg;
+
+  const fallbackFile = defaultMap[action] || "Monkey.png";
+  const fallbackPath = path.join(__dirname, "./assets", fallbackFile);
+  return "file://" + fallbackPath;
+});
+
+ipcMain.on("reset-gif", (event, action) => {
+  const targetDir = path.join(__dirname, "../user", action);
+  if (fs.existsSync(targetDir)) {
+    fs.readdirSync(targetDir).forEach(file => {
+      fs.unlinkSync(path.join(targetDir, file));
+    });
+    console.log(`🔁 ${action} 已重置为默认`);
+  }
+});
+
+let menuWindow;
+
+ipcMain.on("open-menu", () => {
+  menuWindow = new BrowserWindow({
+    width: 400,
+    height: 500,
+    title: "Menu Window",
+    webPreferences: {
+      preload: path.join(__dirname, '../preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false,
+      enableRemoteModule: false
+    }
+  });
+
+  menuWindow.loadFile(path.join(__dirname, 'features/menu/menu.html'));
+
+  // ✅ 关闭事件监听放在创建之后
+  menuWindow.on("closed", () => {
+    menuWindow = null;
+  });
+});
+
+// main.js
+ipcMain.handle("get-quotes", () => {
+  return quotesData;
+});
+
+
+
+
+
+
+
   
 
 

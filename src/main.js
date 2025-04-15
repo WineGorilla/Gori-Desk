@@ -8,6 +8,7 @@ const { languages } = require("prismjs");
 const { error } = require("console");
 
 let quotesData = {}
+let quoteSourceLabel = "default";
 let flaskProcess = null;
 let mainwindow;
 let todoWindow;
@@ -66,48 +67,56 @@ app.whenReady().then(()=>{
         mainwindow = null;
     })
 
-    function isValidQuotes(json) {
-      return (
-        json && typeof json === "object" &&
-        Object.keys(json).length > 0 &&
-        Object.values(json).some(group =>
-          typeof group === "object" && Object.keys(group).length > 0
-        )
-      );
-    }
-
-    const defaultPath = path.join(__dirname,"features","talk","quotes.json");
-    const customPath = path.join(__dirname,'../config/quotes.json');
-    try {
-      let jsonRaw = "";
-      let targetPath = "";
-    
-      if (fs.existsSync(customPath)) {
-        jsonRaw = fs.readFileSync(customPath, "utf-8");
-        const parsed = JSON.parse(jsonRaw);
-        if (isValidQuotes(parsed)) {
-          quotesData = parsed;
-          targetPath = customPath;
-        } else {
-          // 如果 custom 存在但为空/无效，回退默认
-          console.warn("⚠️ 自定义 quotes.custom.json 是空的，使用默认 quotes.json");
-          jsonRaw = fs.readFileSync(defaultPath, "utf-8");
-          quotesData = JSON.parse(jsonRaw);
-          targetPath = defaultPath;
-        }
-      } else {
-        jsonRaw = fs.readFileSync(defaultPath, "utf-8");
-        quotesData = JSON.parse(jsonRaw);
-        targetPath = defaultPath;
-      }
-    
-      console.log("✅ 使用语录文件：", path.basename(targetPath));
-    } catch (err) {
-      console.error("❌ 无法加载语录文件：", err);
-      quotesData = {}; // fallback 空对象
-    }
+    loadQuotes();
 
 })
+
+function isValidQuotes(json) {
+  return (
+    json && typeof json === "object" &&
+    Object.keys(json).length > 0 &&
+    Object.values(json).some(group =>
+      typeof group === "object" && Object.keys(group).length > 0
+    )
+  );
+}
+
+function loadQuotes() {
+  const defaultPath = path.join(__dirname, "features", "talk", "quotes.json");
+  const customPath = path.join(__dirname, "../config/quotes.json");
+
+  try {
+    let targetPath = defaultPath;
+    let jsonRaw = "";
+
+    if (fs.existsSync(customPath)) {
+      jsonRaw = fs.readFileSync(customPath, "utf-8");
+      const parsed = JSON.parse(jsonRaw);
+      if (isValidQuotes(parsed)) {
+        quotesData = parsed;
+        quoteSourceLabel = "自定义";
+        targetPath = customPath;
+      } else {
+        console.warn("⚠️ 自定义 quotes.json 内容无效，使用默认");
+        jsonRaw = fs.readFileSync(defaultPath, "utf-8");
+        quotesData = JSON.parse(jsonRaw);
+        quoteSourceLabel = "默认";
+        targetPath = defaultPath;
+      }
+    } else {
+      jsonRaw = fs.readFileSync(defaultPath, "utf-8");
+      quotesData = JSON.parse(jsonRaw);
+      quoteSourceLabel = "默认";
+      targetPath = defaultPath;
+    }
+
+    console.log("✅ 使用语录文件：", path.basename(targetPath));
+  } catch (err) {
+    console.error("❌ 无法加载语录文件：", err);
+    quotesData = {};
+    quoteSourceLabel = "未知";
+  }
+}
 
 app.on("window-all-closed",()=>{
     if (process.platform !== 'darwin') app.quit();
@@ -820,6 +829,53 @@ ipcMain.on("open-menu", () => {
 ipcMain.handle("get-quotes", () => {
   return quotesData;
 });
+
+ipcMain.handle("get-quotes-source",()=>{return quoteSourceLabel})
+
+
+ipcMain.handle("upload-custom-quotes",async ()=>{
+  try {
+    const {canceled,filePaths} = await dialog.showOpenDialog({
+      title:"选择自定义语录JSON文件",
+      filters:[{name:"JSON文件",extensions:["json"]}],
+      properties:["openFile"]
+    });
+
+    if (canceled || filePaths.length === 0){
+      return {success:false,message:"用户取消"}
+    }
+    const sourcePath = filePaths[0];
+    const destPath = path.join(__dirname,"../config/quotes.json")
+
+    const content = fs.readFileSync(sourcePath,'utf-8');
+    const parsed = JSON.parse(content);
+
+    if (!parsed.zh && !parsed.en){
+      return {success:false,message:"文件格式无效"}
+    }
+    fs.writeFileSync(destPath,JSON.stringify(parsed,null,2),'utf-8');
+    return {success:true};
+  } catch (err){
+    console.error("Failure to upload",err);
+    return {success:false,message:err.message}
+  }
+});
+
+ipcMain.handle("reset-custom-quotes", () => {
+  const customPath = path.join(__dirname, "../config/quotes.json");
+  try {
+    if (fs.existsSync(customPath)) {
+      fs.unlinkSync(customPath); // ✅ 删除自定义语录
+      console.log("Has been delete");
+      return { success: true };
+    } else {
+      return { success: false, message: "File not exist" };
+    }
+  } catch (err) {
+    return { success: false, message: err.message };
+  }
+});
+
 
 
 

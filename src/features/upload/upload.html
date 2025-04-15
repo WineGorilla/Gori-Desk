@@ -218,6 +218,16 @@ img {
     </nav>
   </aside>
   <div class="container">
+    <h2>上传自定义语录JSON</h2>
+    <div style="margin-top: 10px;">
+      <span>📂 当前使用语录：</span>
+      <span id="currentQuoteSource" style="font-weight: bold;">（加载中...）</span>
+    </div>    
+    <div id="quoteJson">
+      <button id="uploadQuoteJson">上传</button>
+      <button id="resetQuoteJson" style="margin-left: 10px;">默认</button>
+      <span id="uploadStatus" style="margin-left: 10px; color: #666;"></span>
+    </div>
     <h2>上传你的宠物 GIF / PNG</h2>
 
     <div id="uploadArea"></div>
@@ -331,6 +341,51 @@ async function initPreview() {
     }
   }
 }
+
+document.getElementById("uploadQuoteJson").addEventListener("click",async ()=>{
+  const result = await window.talkAPI.uploadQuotes();
+  const status = document.getElementById("uploadStatus");
+  if (result.success){
+    status.textContent = "上传成功";
+    status.style.color = "orange";
+  } else {
+    status.textContent = "上传失败";
+    status.style.color = "red";
+  }
+})
+
+document.getElementById("resetQuoteJson").addEventListener("click",async ()=>{
+  const confirmReset = confirm("你确定恢复默认吗？这将删除当前自定义语录我呢见");
+  if (!confirmReset) return;
+
+  const result = await window.talkAPI.resetQuotes();
+  const status = document.getElementById("uploadStatus");
+  if (result.success){
+    status.textContent = "已恢复";
+    status.style.color = 'green';
+  } else {
+    status.textContent = "恢复失败";
+    status.style.color = "red";
+  }
+})
+
+async function updateQuoteStatus() {
+  const source = await window.talkAPI.getQuoteSource();
+  const statusEl = document.getElementById("currentQuoteSource");
+
+  if (source === "自定义") {
+    statusEl.textContent = "自定义 ✅";
+    statusEl.style.color = "orange";
+  } else if (source === "默认") {
+    statusEl.textContent = "默认 ✅";
+    statusEl.style.color = "#28a745";
+  } else {
+    statusEl.textContent = "未知 ❌";
+    statusEl.style.color = "red";
+  }
+}
+
+window.addEventListener("DOMContentLoaded", updateQuoteStatus);
 
 
   </script>

@@ -45,7 +45,10 @@ contextBridge.exposeInMainWorld("talkAPI", {
     getPendingTasks: () => ipcRenderer.invoke("getPendingTasks"),
     getQuotes: () => {
       return ipcRenderer.invoke("get-quotes");
-    }    
+    },
+    uploadQuotes: () => ipcRenderer.invoke("upload-custom-quotes"),
+    resetQuotes:()=>ipcRenderer.invoke("reset-custom-quotes"),
+    getQuoteSource:()=>ipcRenderer.invoke("get-quotes-source")
   });
 
   contextBridge.exposeInMainWorld("dragAPI", {

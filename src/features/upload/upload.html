@@ -218,6 +218,15 @@ img {
     </nav>
   </aside>
   <div class="container">
+    <h3>可用模型：</h3>
+    <select id="modelSelect"></select>
+    <button id="setModelBtn">切换模型</button>
+    
+    <h4>输入自定义模型名：</h4>
+    <input id="customModel" placeholder="例如：gemma:2b" />
+    <button onclick="downloadModel()">下载模型</button>
+    <p id="modelStatus"></p>
+
     <h2>上传自定义语录JSON</h2>
     <div style="margin-top: 10px;">
       <span>📂 当前使用语录：</span>
@@ -232,7 +241,7 @@ img {
 
     <div id="uploadArea"></div>
   </div>
-
+  <script src="model.js"></script>
   <script>
     const actions = [
       { key: "idle", label: "默认" },

@@ -100,6 +100,14 @@ contextBridge.exposeInMainWorld("wholemenuAPI", {
   }
 });
 
+contextBridge.exposeInMainWorld("ollamaAPI", {
+  getAvailableModels: () => ipcRenderer.invoke("get-available-models"),
+  downloadModel: (modelName) => ipcRenderer.invoke("download-model", modelName),
+  setCurrentModel: (modelName) => ipcRenderer.send("set-current-model", modelName),
+  getCurrentModel: () => ipcRenderer.invoke("get-current-model")
+});
+
+
   
   
   

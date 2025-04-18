@@ -6,6 +6,9 @@ const RWKV = require("rwkv-cpp-node");
 const {spawn} = require("child_process");
 const { languages } = require("prismjs");
 const { error } = require("console");
+const { name } = require("ejs");
+const http = require("http");
+const os = require("os");
 
 let quotesData = {}
 let quoteSourceLabel = "default";
@@ -203,6 +206,7 @@ async function createChildWindow(name, file, width, height, offsetX, offsetY) {
     
 
 // 👇 失去焦点后关闭，但排除切换到主窗口的情况
+    if (name !== "chat") {
     childWindows[name].on("blur", () => {
     setTimeout(() => {
         const focused = BrowserWindow.getFocusedWindow();
@@ -213,6 +217,7 @@ async function createChildWindow(name, file, width, height, offsetX, offsetY) {
         }
     }, 10);
     });
+  }
 
     childWindows[name].on("closed", () => {
         childWindows[name] = null;
@@ -674,16 +679,19 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
   const userDir = path.join(__dirname,"../user");
   let uploadWindow = null;
 
-  ipcMain.on("open-upload-window", () => {
+  ipcMain.on("open-upload-window", async () => {
     if (uploadWindow && !uploadWindow.isDestroyed()) {
       uploadWindow.focus();
       return;
     }
-  
+
+    try{
+    startOllama()
+
     uploadWindow = new BrowserWindow({
       width: 750,
       height: 350,
-      title: "上传宠物 GIF",
+      title: "自定义",
       icon:path.join(__dirname,"assets","icon","goriicon.ico"),
       webPreferences: {
         preload: path.join(__dirname, '../preload.js'),
@@ -698,10 +706,15 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
     uploadWindow.loadFile(path.join(__dirname, 'features/upload/upload.html'));
   
     uploadWindow.on("closed", () => {
+      stopOllama();
       uploadWindow = null;
     });
+    } catch (error){
+      console.log(error.message)
+    }
   });
-  
+
+
   ipcMain.handle("select-gif", async () => {
     console.log("⚡️ 正在打开文件选择窗口");
     const result = await dialog.showOpenDialog({
@@ -875,6 +888,148 @@ ipcMain.handle("reset-custom-quotes", () => {
     return { success: false, message: err.message };
   }
 });
+
+
+
+const modelDir = path.join(os.homedir(), ".ollama", "models", "manifests", "registry.ollama.ai", "library");
+const modelRoot = path.join(__dirname, "ollama", "models");
+const modelListFile = path.join(__dirname, "backend", "downloaded_models.txt");
+const currentModelPath = path.join(__dirname, 'backend', 'current_model.txt');
+let currentModel = "phi"
+
+ipcMain.handle("get-available-models", async () => {
+  if (!fs.existsSync(modelListFile)) return [];
+
+  const lines = fs.readFileSync(modelListFile, "utf-8")
+    .split("\n")
+    .map(l => l.trim())
+    .filter(Boolean);
+
+  return Array.from(new Set(lines)); // 去重后返回
+});
+
+ipcMain.handle("get-current-model", () => {
+  if (fs.existsSync(currentModelPath)) {
+    return fs.readFileSync(currentModelPath, "utf-8").trim(); 
+  } else {
+    return "qwen:0.5b"; // 👈 默认模型名称
+  }
+});
+
+ipcMain.on("set-current-model",(_e, name) => {
+  currentModel = name;
+  console.log("The model has been changed:", name);
+
+  const filePath = path.join(__dirname, "backend", "current_model.txt");
+  fs.writeFileSync(filePath, name, "utf-8");
+});
+
+let ollamaProcess = null;
+
+// 启动 ollama serve 时必须设置 OLLAMA_MODELS！
+function startOllama() {
+  const ollamaExe = path.join(__dirname, "./ollama/ollama.exe");
+  const modelDir = path.join(__dirname, "ollama", "models");
+
+  const env = {
+    ...process.env,
+    OLLAMA_MODELS: modelDir // ✅ 关键！必须在 serve 阶段设置
+  };
+
+  ollamaProcess = spawn(ollamaExe, ["serve"], {
+    cwd: path.dirname(ollamaExe),
+    env,
+    detached: true,
+    stdio: "ignore",
+    windowsHide: true
+  });
+
+  ollamaProcess.unref();
+  console.log("🚀 Ollama started, PID:", ollamaProcess.pid);
+}
+
+
+function stopOllama() {
+  if (ollamaProcess && ollamaProcess.pid) {
+    try {
+      // 判断该 PID 是否仍然存在
+      process.kill(ollamaProcess.pid, 0); // 这一步不会杀死，只是检查
+      process.kill(ollamaProcess.pid);    // 真正 kill
+      console.log("Exit Ollama");
+    } catch (err) {
+      if (err.code === "ESRCH") {
+        console.warn("ollama has been exited");
+      } else {
+        console.error("Cannot exit ollama:", err);
+      }
+    } finally {
+      ollamaProcess = null;
+    }
+  }
+}
+
+
+
+
+// 使用 HTTP API 拉取模型
+ipcMain.handle("download-model", async (_e, modelName) => {
+  const modelExe = path.join(__dirname, "ollama", "ollama.exe");
+
+  if (!fs.existsSync(modelExe)) {
+    throw new Error("ollama.exe is not existed");
+  }
+
+  if (!fs.existsSync(modelRoot)) {
+    fs.mkdirSync(modelRoot, { recursive: true });
+  }
+
+  return new Promise((resolve, reject) => {
+    const env = {
+      ...process.env,
+      OLLAMA_MODELS: modelRoot // ✅ 下载路径设定
+    };
+
+    const cmd = spawn(modelExe, ["pull", modelName], {
+      cwd: path.dirname(modelExe),
+      env
+    });
+
+    cmd.stdout.on("data", d => console.log("Ok", d.toString()));
+    cmd.stderr.on("data", d => console.error("No", d.toString()));
+
+    cmd.on("close", code => {
+      if (code === 0) {
+        console.log(`模型 ${modelName} Download Successfully`);
+        currentModel = modelName;
+        const modelPath = path.join(modelRoot, "manifests", "registry.ollama.ai", "library", modelName.split(":")[0]);
+        console.log(`✅ 模型 ${modelName} 下载成功，存储路径为：\n${modelPath}`);
+        saveDownloadedModel(modelName)
+        resolve();
+      } else {
+        reject(new Error("Cannot download the model"));
+      }
+    });
+  });
+});
+
+function saveDownloadedModel(name) {
+  let existing = [];
+  if (fs.existsSync(modelListFile)) {
+    existing = fs.readFileSync(modelListFile, "utf-8").split("\n").filter(Boolean);
+  }
+  if (!existing.includes(name)) {
+    fs.appendFileSync(modelListFile, name + "\n", "utf-8");
+  }
+}
+
+
+
+
+
+
+
+
+
 
 
 

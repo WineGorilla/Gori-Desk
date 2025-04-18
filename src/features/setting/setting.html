@@ -196,14 +196,6 @@ nav {
       </div>
 
       <div class="setting-group">
-        <label for="modelSelect" id="modelLabel">选择大语言模型:</label>
-        <select id="modelSelect">
-          <option value="phi">RWKV</option>
-          <option value="ollama">Ollama</option>
-        </select>
-      </div>
-
-      <div class="setting-group">
         <div class="inline-row">
         <label for="transparencyRange" id="transLabel">透明度 (0% ~ 100%):</label>
         <input type="range" id="transparencyRange" min="20" max="100" step="1">
@@ -236,7 +228,6 @@ const i18n = {
   zh: {
     title: "基础设置",
     selectLanguage: "选择语言",
-    selectModel: "选择大语言模型:",
     transparencyLabel: "透明度",
     autoLaunch: "开机自启:",
     enableChat: "启用对话:",
@@ -245,7 +236,6 @@ const i18n = {
   en: {
     title: "Settings",
     selectLanguage: "Choose Language:",
-    selectModel: "Choose AI Model:",
     transparencyLabel: "Transparency (0% ~ 100%):",
     autoLaunch: "Auto Launch:",
     enableChat: "Enable Chat:",
@@ -260,7 +250,6 @@ function updateLanguage(lang) {
   document.title = t.title;
   document.getElementById("titleText").textContent = t.title;
   document.getElementById("langLabel").textContent = t.selectLanguage;
-  document.getElementById("modelLabel").textContent = t.selectModel;
   document.getElementById("transLabel").textContent = t.transparencyLabel;
   document.getElementById("autoLaunchLabel").textContent = t.autoLaunch;
   document.getElementById("chatLabel").textContent = t.enableChat;
@@ -280,7 +269,6 @@ async function initSettings() {
 
     // 初始化表单控件
     document.getElementById("languageSelect").value = settings.language;
-    document.getElementById("modelSelect").value = settings.model;
     document.getElementById("transparencyRange").value = settings.transparency;
     document.getElementById("autoLaunch").checked = settings.autoLaunch;
     document.getElementById("enableChat").checked = settings.enableChat;

@@ -12,7 +12,7 @@
       margin: 0;
       font-family: "Segoe UI", sans-serif;
       display: flex;
-      background-color: #f4f4f4;
+      background-color: white;
       color: #333;
       font:12px;
     }
@@ -23,7 +23,7 @@
   width: 180px;
   height: 100vh;
   background-color: #ffffff;
-  border-right: 1px solid #e0e0e0;
+  border-right: 1px solid #f1f1f3;
   display: flex;
   flex-direction: column;
   padding: 24px 16px;
@@ -149,7 +149,7 @@ nav {
   width: 100%;
   padding: 12px;
   font-size: 16px;
-  background-color: #4CAF50;
+  background-color: #ff9800;
   color: white;
   border: none;
   border-radius: 8px;
@@ -158,7 +158,7 @@ nav {
 }
 
 #saveBtn:hover {
-  background-color: #45a049;
+  background-color: #fb8c00; 
 }
 
 
@@ -172,9 +172,9 @@ nav {
   <aside class="sidebar">
     <div class="logo"><img class="iconImg" src="../../assets/icon/goriicon.png"> <span>GoriDesk</span></div>
     <nav>
-      <button class="nav-btn" onclick="window.menuAPI.openInfo()">📄 资料</button>
-      <button class="nav-btn">⚙️ 基础设置</button>
-      <button class="nav-btn">🌐 自定义</button>
+      <button class="nav-btn" id="navInfoBtn" onclick="window.menuAPI.openInfo()">资料</button>
+      <button class="nav-btn" id="navSettingBtn" >基础设置</button>
+      <button class="nav-btn" id="navUploadBtn" onclick="window.menuAPI.openUpload()">自定义</button>
     </nav>
   </aside>
 
@@ -231,15 +231,21 @@ const i18n = {
     transparencyLabel: "透明度",
     autoLaunch: "开机自启:",
     enableChat: "启用对话:",
-    save: "保存设置"
+    save: "保存设置",
+    navInfo:'资料',
+    navSetting:"基础设置",
+    navUpload:"自定义"
   },
   en: {
     title: "Settings",
     selectLanguage: "Choose Language:",
-    transparencyLabel: "Transparency (0% ~ 100%):",
+    transparencyLabel: "Transparency:",
     autoLaunch: "Auto Launch:",
     enableChat: "Enable Chat:",
-    save: "Save Settings"
+    save: "Save Settings",
+    navInfo: "Info",
+    navSetting: "Settings",
+    navUpload: "Customize"
   }
 };
 
@@ -254,6 +260,9 @@ function updateLanguage(lang) {
   document.getElementById("autoLaunchLabel").textContent = t.autoLaunch;
   document.getElementById("chatLabel").textContent = t.enableChat;
   document.getElementById("saveBtn").textContent = t.save;
+  document.getElementById("navInfoBtn").textContent = t.navInfo;
+  document.getElementById("navSettingBtn").textContent = t.navSetting;
+  document.getElementById("navUploadBtn").textContent = t.navUpload;
 }
 
 // 📦 初始化设置
@@ -291,7 +300,6 @@ function bindSaveButton() {
   document.getElementById("saveBtn").addEventListener("click", () => {
     const settings = {
       language: document.getElementById("languageSelect").value,
-      model: document.getElementById("modelSelect").value,
       transparency: parseInt(document.getElementById("transparencyRange").value),
       autoLaunch: document.getElementById("autoLaunch").checked,
       enableChat: document.getElementById("enableChat").checked
@@ -329,12 +337,20 @@ function bindTransparencyChange() {
   });
 }
 
+function bindTalkChange(){
+  document.getElementById("enableChat").addEventListener("change", (e) => {
+  const value = e.target.checked;
+  window.settingAPI.changeTalk(value); // ✅ 通知主进程，让其广播给其他窗口
+});
+}
+
 // 🚀 页面加载后初始化
 window.addEventListener("DOMContentLoaded", () => {
   initSettings();
   bindSaveButton();
   bindLanguageChange();
   bindTransparencyChange();
+  bindTalkChange();
 });
 
 </script>

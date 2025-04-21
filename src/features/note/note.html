@@ -12,7 +12,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            color: #666;
+            color: #333333;
         }
 
         /* 顶部工具栏 */
@@ -20,6 +20,7 @@
             width: 100%;
             max-width: 350px;
             background: rgb(248,248,248);
+            background-color: white;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -36,7 +37,7 @@
             font-size: 16px;
             cursor: pointer;
             -webkit-app-region: no-drag; /* 保证点击有效 */
-            color:red;
+            color: #888;
         }
 
 .close-btn:hover {
@@ -104,6 +105,7 @@
             width: 100%;
             max-width: 350px;
             background: rgb(248,248,248);
+            background-color: white;
             padding: 15px;
             border-radius: 0 0 10px 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -156,7 +158,6 @@
       <!-- 子窗口HTML顶部 -->
       <div class="window-header">
         <span id="header">My Note</span>
-        <button class="close-btn">X</button>
       </div>
       <div class="export-container">
         <button id="export-btn" class="export-btn">Import ▼</button>
@@ -164,7 +165,9 @@
           <button id="exportTxt">📄 TXT</button>
           <button id="exportMd">📄 MD</button>
         </div>
+        <button class="close-btn">x</button>
       </div>
+
     </div>
   
     <!-- 笔记区域 -->

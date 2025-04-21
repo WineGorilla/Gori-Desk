@@ -48,7 +48,9 @@ contextBridge.exposeInMainWorld("talkAPI", {
     },
     uploadQuotes: () => ipcRenderer.invoke("upload-custom-quotes"),
     resetQuotes:()=>ipcRenderer.invoke("reset-custom-quotes"),
-    getQuoteSource:()=>ipcRenderer.invoke("get-quotes-source")
+    getQuoteSource:()=>ipcRenderer.invoke("get-quotes-source"),
+    onChatLoading: (callback) => ipcRenderer.on("chat-loading", callback),
+    onChatLoaded:(cb)=>{ipcRenderer.on("chat-loaded",cb)}
   });
 
   contextBridge.exposeInMainWorld("dragAPI", {
@@ -64,7 +66,7 @@ contextBridge.exposeInMainWorld("talkAPI", {
 
   contextBridge.exposeInMainWorld('settingAPI', {
     getSettings: () => ipcRenderer.invoke('get-settings'),
-    saveSettings: (settings) => ipcRenderer.send('save-settings', settings),
+    saveSettings: (settings) => ipcRenderer.invoke('save-settings', settings),
     openSetting: () => ipcRenderer.send('open-setting'),
   
     sendTransparencyToMain: (value) => ipcRenderer.send('update-transparency', value),
@@ -77,8 +79,13 @@ contextBridge.exposeInMainWorld("talkAPI", {
         callback(lang);
       });
     },
-  
-    changeLanguage: (lang) => ipcRenderer.send('change-language', lang)
+    changeLanguage: (lang) => ipcRenderer.send('change-language', lang),
+    onTalkChange:(callback)=>{
+      ipcRenderer.on("update-talk",(event,value)=>{
+        callback(value)
+      })
+    },
+    changeTalk:(value)=>{ipcRenderer.send("change-talk",value)}
   });
 
   contextBridge.exposeInMainWorld("gifAPI", {
@@ -91,6 +98,8 @@ contextBridge.exposeInMainWorld("talkAPI", {
 contextBridge.exposeInMainWorld("petAPI", {
   getPetImage: (action) => ipcRenderer.invoke("get-pet-image", action),
   getCustomGifPath: (action) => ipcRenderer.invoke("get-custom-gif-path", action),
+  savePersonality:(content)=>{ ipcRenderer.send("save-personality",content)},
+  getPersonality: () => ipcRenderer.invoke("get-personality")
 });
 
 

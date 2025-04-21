@@ -12,7 +12,7 @@
       margin: 0;
       font-family: "Segoe UI", sans-serif;
       display: flex;
-      background-color: #f4f4f4;
+      background-color: white;
       color: #333;
       font:12px;
     }
@@ -23,7 +23,7 @@
   width: 180px;
   height: 100vh;
   background-color: #ffffff;
-  border-right: 1px solid #e0e0e0;
+  border-right: 1px solid #f1f1f3;
   display: flex;
   flex-direction: column;
   padding: 24px 16px;
@@ -187,7 +187,7 @@ select {
   align-self: flex-start;
   padding: 10px 16px;
   font-size: 14px;
-  background-color: #4CAF50;
+  background-color: #ff9800;
   color: white;
   border: none;
   border-radius: 6px;
@@ -197,7 +197,7 @@ select {
 }
 
 #saveBtn:hover {
-  background-color: #45a049;
+  background-color: #fb8c00; 
 }
 
   </style>
@@ -206,9 +206,9 @@ select {
   <aside class="sidebar">
     <div class="logo"><img class="iconImg" src="../../assets/icon/goriicon.png"> <span>GoriDesk</span></div>
     <nav>
-      <button class="nav-btn" onclick="window.menuAPI.openInfo()">📄 资料</button>
-      <button class="nav-btn">⚙️ 基础设置</button>
-      <button class="nav-btn">🌐 自定义</button>
+      <button class="nav-btn" id="navInfoBtn">资料</button>
+      <button class="nav-btn" id="navSettingBtn" onclick="window.settingAPI.openSetting()">基础设置</button>
+      <button class="nav-btn" id="navUploadBtn" onclick="window.menuAPI.openUpload()">自定义</button>
     </nav>
   </aside>
   <div class="card">

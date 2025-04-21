@@ -5,9 +5,10 @@ const i18n = {
       todo: "待办事项",
       note: "笔记",
       eat: "投喂",
-      menu_info: "👤个人信息",
-      menu_setting: "⚙️设置",
-      menu_exit: "❌退出"
+      menu_info: "个人信息",
+      menu_setting: "设置",
+      menu_upload:"自定义",
+      menu_exit: "退出"
     },
     en: {
       greeting: "Hello, Master!",
@@ -15,9 +16,10 @@ const i18n = {
       todo: "To-Do",
       note: "Note",
       eat: "Feed",
-      menu_info: "👤 Info",
-      menu_setting: "⚙️ Settings",
-      menu_exit: "❌ Quit"
+      menu_info: "Info",
+      menu_setting: "Settings",
+      menu_upload:"Customize",
+      menu_exit: "Quit"
     }
   };
   
@@ -34,6 +36,7 @@ const i18n = {
     document.getElementById("menu-info").textContent = t.menu_info;
     document.getElementById("menu-setting").textContent = t.menu_setting;
     document.getElementById("menu-exit").textContent = t.menu_exit;
+    document.getElementById("menu-upload").textContent = t.menu_upload;
   }
   
   // ✅ 页面初始化加载语言
@@ -42,9 +45,9 @@ const i18n = {
       const settings = await window.settingAPI.getSettings();
       const lang = settings.language || "zh";
       updateLanguage(lang);
-      console.log("🌍 初始语言已加载:", lang);
+      console.log("初始语言已加载:", lang);
     } catch (err) {
-      console.error("❌ 初始化语言失败:", err);
+      console.error("初始化语言失败:", err);
       updateLanguage("zh");
     }
   });
@@ -52,7 +55,7 @@ const i18n = {
   // ✅ 主动监听来自设置页面的语言切换通知
   window.settingAPI.onLanguageChange((lang) => {
     updateLanguage(lang);
-    console.log("🔁 主窗口语言已切换为:", lang);
+    console.log("主窗口语言已切换为:", lang);
   });
   
 

@@ -25,7 +25,7 @@ let isDragging = false;
 let dragTimeout;
 let rwkvInstance = null;
 const notePath = path.join(__dirname,"note.txt");
-const configDir = path.join(__dirname, "..",'config');
+const configDir = path.join(__dirname, '../config');
 const settingsPath = path.join(configDir, 'settings.json');
 
 const db = new sqlite3.Database(path.join(__dirname,"todo.db"),(err)=>{
@@ -168,7 +168,7 @@ async function createChildWindow(name, file, width, height, offsetX, offsetY) {
 
 
     if (name === "chat") {
-
+        mainwindow.webContents.send("chat-loading");
         startFlask();
 
         // 🔁 Automatically wait for Flask and Ollama to be ready
@@ -193,6 +193,7 @@ async function createChildWindow(name, file, width, height, offsetX, offsetY) {
       
         try {
           const result = await waitForFlaskReady();
+          mainwindow.webContents.send("chat-loaded")
           console.log("✅ Model is ready. Opening chat window...");
         } catch (err) {
           console.error(err.message);
@@ -622,7 +623,7 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
   });
   
   // 保存设置
-  ipcMain.on('save-settings', (event, settings) => {
+  ipcMain.handle('save-settings', (event, settings) => {
     try {
       fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2));
       console.log('设置已保存:', settings);
@@ -668,6 +669,13 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
       mainwindow.webContents.send('update-transparency', value);
     }
   });
+
+  ipcMain.on("change-talk", (event, value) => {
+    if (mainwindow && mainwindow.webContents) {
+      mainwindow.webContents.send('update-talk', value); 
+    }
+  });
+  
   
   ipcMain.on('change-language', (event, lang) => {
     if (mainwindow && mainwindow.webContents) {
@@ -889,6 +897,25 @@ ipcMain.handle("reset-custom-quotes", () => {
   }
 });
 
+
+ipcMain.on("save-personality",(event,content)=>{
+  const personalityPath = path.join(__dirname,"backend","personality.txt")
+  try {
+    fs.writeFileSync(personalityPath,content.trim(),'utf-8');
+    console.log("personality has been updated")
+  } catch(err){
+    console.error("cannot update the personality:",err)
+  }
+})
+
+ipcMain.handle("get-personality",async ()=>{
+  const filepath = path.join(__dirname,"backend","personality.txt")
+  try {
+    return fs.readFileSync(filepath,'utf-8')
+  } catch(err){
+    return ""
+  }
+})
 
 
 const modelDir = path.join(os.homedir(), ".ollama", "models", "manifests", "registry.ollama.ai", "library");

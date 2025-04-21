@@ -58,7 +58,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         labelPetBirthday: "生日",
         labelPetZodiac: "星座",
         save: "保存",
-        genderOptions: ["请选择", "男", "女"]
+        genderOptions: ["请选择", "男", "女"],
+        navInfo:"资料",
+        navSetting:"基础设置",
+        navUpload:"自定义"
       },
       en: {
         titleOwner: "Owner Info",
@@ -70,7 +73,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         labelPetBirthday: "Birthday",
         labelPetZodiac: "Zodiac Sign",
         save: "Save",
-        genderOptions: ["Select", "Male", "Female"]
+        genderOptions: ["Select", "Male", "Female"],
+        navInfo: "Info",
+        navSetting: "Settings",
+        navUpload: "Customize"
       }
     };
 
@@ -84,6 +90,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("label-pet-birthday").textContent = t.labelPetBirthday;
     document.getElementById("label-pet-zodiac").textContent = t.labelPetZodiac;
     document.getElementById("saveBtn").textContent = t.save;
+    document.getElementById("navInfoBtn").textContent = t.navInfo;
+    document.getElementById("navSettingBtn").textContent = t.navSetting;
+    document.getElementById("navUploadBtn").textContent = t.navUpload;
+
 
     // 性别选项
     const genderSelect = document.getElementById("owner-gender");

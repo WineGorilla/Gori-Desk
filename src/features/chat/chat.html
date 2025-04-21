@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: "Segoe UI", sans-serif;
-      color: #24292f;
+      color: #333333;
       margin: 0;
       padding: 20px;
       display: flex;
@@ -17,7 +17,7 @@
     .container {
       width: 80%;
       max-width: 500px;
-      background: #f6f8fa;
+      background: white;
       border: 1px solid #d0d7de;
       border-radius: 8px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -48,13 +48,13 @@
 
 
     #chat-box {
-      background-color: #f6f8fa;
+      background-color: white;
       border: none;
       padding: 10px;
       height: 300px;
       overflow-y: auto;
       border-radius: 6px;
-      font-family: Consolas, monospace;
+      font-family: "Segoe UI", sans-serif;
       font-size: 14px;
       margin-bottom: 10px;
       word-wrap: break-word;
@@ -87,7 +87,7 @@
 
     #message {
   width: 90%;
-  font-family: Consolas, monospace;
+  font-family: "Segoe UI", sans-serif;
   resize: none;
   overflow-y: auto;
   border: none;
@@ -110,7 +110,7 @@
         display: flex;
         justify-content: flex-end;
         gap: 8px;
-        margin-top: 6px;
+        margin-top: 3px;
     }
 
 
@@ -148,8 +148,8 @@
 
 .msg {
   display: flex;
-  margin: 5px 0;
-  font-size: 14px;
+  margin: 8px 0;
+  font-size: 13px;
   word-break: break-word;
 }
 
@@ -178,11 +178,11 @@
   white-space: pre-wrap;
   line-height: 1.4;
   color: #24292f;
-  font-family: Consolas, monospace;
+  font-family: "Segoe UI", sans-serif;
 }
 
 .msg.user .bubble {
-  background: #d1d5db;
+  background: #ececf1;
   color: #333;
 }
 
@@ -192,15 +192,15 @@
 <body>
   <div class="container">
     <div class="header-row">
-      <h4>💬GoriDesk</h4>
-      <div class="close-btn" onclick="closeChat()" title="关闭">X</div>
+      <h4>GoriDesk</h4>
+      <div class="close-btn" onclick="closeChat()" title="关闭">x</div>
     </div>    
     <hr>
     <div id="chat-box"></div>
     <div class="input-row">
       <textarea id="message" placeholder="..." rows="2"></textarea>
       <div class="functionBox">
-        <button onclick="sendMessage()">></button>
+        <button id="messageInput" onclick="sendMessage()">></button>
       </div>
     </div>
   </div>
@@ -256,6 +256,15 @@ async function sendMessage() {
 function closeChat() {
   window.chatAI.notifyClose(); // 让主进程做所有事
 }
+
+window.addEventListener("keydown", async (event) => {
+  const input = event.target.value.trim();
+  if (event.key === "Enter" && input !== "") {
+    event.preventDefault();
+    sendMessage();
+  }
+});
+
 
   </script>
 </body>

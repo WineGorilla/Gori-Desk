@@ -1,7 +1,6 @@
 {
-  "language": "zh",
-  "model": "phi",
-  "transparency": 99,
+  "language": "en",
+  "transparency": 100,
   "autoLaunch": false,
-  "enableChat": true
+  "enableChat": false
 }

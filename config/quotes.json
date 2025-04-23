@@ -1,0 +1,26 @@
+{
+  "zh": {
+    "default": [
+      "你好，我是你的小助手！",
+      "今天的你也很棒哦～"
+    ],
+    "lowEnergy": [
+      "我有点累了，可以休息一下吗？"
+    ],
+    "highEnergy": [
+      "冲冲冲！现在状态超好！"
+    ]
+  },
+  "en": {
+    "default": [
+      "Hello! I'm your assistant.",
+      "You're doing great today!"
+    ],
+    "lowEnergy": [
+      "Feeling a bit tired... mind taking a break?"
+    ],
+    "highEnergy": [
+      "Let's gooo! I'm super energetic now!"
+    ]
+  }
+}

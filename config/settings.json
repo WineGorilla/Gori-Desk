@@ -1,6 +1,6 @@
 {
-  "language": "en",
+  "language": "zh",
   "transparency": 100,
   "autoLaunch": false,
-  "enableChat": false
+  "enableChat": true
 }

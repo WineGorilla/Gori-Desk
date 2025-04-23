@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8">
-  <title>自定义</title>
+  <title></title>
   <style>
     * {
       box-sizing: border-box;
@@ -304,12 +304,11 @@ img {
       <div class="model-row">
         <select id="modelSelect" class="select"></select>
         <button id="setModelBtn" class="btn">切换模型</button>
-        <button id="deleteSelectedModels" class="deleteBtn">删除模型</button>
       </div>
       <h4>模型下载</h4>
       <div class="model-row">
         <input id="customModel" class="input" placeholder="例如：gemma:2b" />
-        <button onclick="downloadModel()" class="btn">下载</button>
+        <button onclick="downloadModel()" class="btn" id="downloadBtn"></button>
       </div>
       <p id="modelStatus" class="status-text"></p>
       <h4>性格设定</h4>
@@ -321,11 +320,11 @@ img {
     </div>
     
     <div class="section">
-      <h2>上传自定义语录JSON</h2>
+      <h2 id="quoteTitle">上传自定义语录JSON</h2>
       <div class="quote-block">
         <div>
-          <span>当前使用语录：</span>
-          <span id="currentQuoteSource" class="highlight">（加载中...）</span>
+          <span id="quoteLabel"></span>
+          <span id="currentQuoteSource" class="highlight"></span>
         </div>
         <div class="button-row">
           <button id="uploadQuoteJson" class="btn">上传</button>
@@ -337,7 +336,79 @@ img {
 
     <div class="section">
       <h2>自定义形象 GIF / PNG</h2>
-      <div id="uploadArea"></div>
+      <div id="uploadArea">
+
+        <div class="action-block" data-action="idle">
+          <img id="preview-idle" src="" />
+          <div class="label" data-label></div>
+          <div class="showdiv">
+            <button class="upload-btn">上传</button>
+            <button class="reset-btn" style="background-color: #ccc;">默认</button>
+          </div>
+          <div class="status" id="status-idle"></div>
+        </div>
+
+        <div class="action-block" data-action="struggle">
+          <img id="preview-struggle" src="" />
+          <div class="label" data-label></div>
+          <div class="showdiv">
+            <button class="upload-btn">上传</button>
+            <button class="reset-btn" style="background-color: #ccc;">默认</button>
+          </div>
+          <div class="status" id="status-struggle"></div>
+        </div>
+
+        <div class="action-block" data-action="eatA">
+          <img id="preview-eatA" src="" />
+          <div class="label" data-label></div>
+          <div class="showdiv">
+            <button class="upload-btn"></button>
+            <button class="reset-btn" style="background-color: #ccc;">默认</button>
+          </div>
+          <div class="status" id="status-eatA"></div>
+        </div>
+
+        <div class="action-block" data-action="eatB">
+          <img id="preview-eatB" src="" />
+          <div class="label" data-label></div>
+          <div class="showdiv">
+            <button class="upload-btn">上传</button>
+            <button class="reset-btn" style="background-color: #ccc;">默认</button>
+          </div>
+          <div class="status" id="status-eatB"></div>
+        </div>
+
+        <div class="action-block" data-action="eatC">
+          <img id="preview-eatC" src="" />
+          <div class="label" data-label></div>
+          <div class="showdiv">
+            <button class="upload-btn">上传</button>
+            <button class="reset-btn" style="background-color: #ccc;">默认</button>
+          </div>
+          <div class="status" id="status-eatC"></div>
+        </div>
+
+        <div class="action-block" data-action="hungry">
+          <img id="preview-hungry" src="" />
+          <div class="label" data-label></div>
+          <div class="showdiv">
+            <button class="upload-btn"></button>
+            <button class="reset-btn" style="background-color: #ccc;">默认</button>
+          </div>
+          <div class="status" id="status-hungry"></div>
+        </div>
+
+        <div class="action-block" data-action="comfort">
+          <img id="preview-comfort" src="" />
+          <div class="label" data-label></div>
+          <div class="showdiv">
+            <button class="upload-btn">上传</button>
+            <button class="reset-btn" style="background-color: #ccc;">默认</button>
+          </div>
+          <div class="status" id="status-comfort"></div>
+        </div>
+
+      </div>
     </div>
   </div>
   <script>
@@ -352,162 +423,9 @@ img {
   </script>
   <script type="module" src="lucide.js"></script>
   <script src="model.js"></script>
-  <script>
-    const actions = [
-      { key: "idle", label: "默认" },
-      { key: "struggle", label: "挣扎" },
-      { key: "eatA", label: "食物A" },
-      { key: "eatB", label: "食物B" },
-      { key: "eatC", label: "食物C" },
-      { key: "hungry", label: "饿" },
-      { key: "comfort", label: "安慰" }
-    ];
-
-    const uploadArea = document.getElementById("uploadArea");
-
-    actions.forEach(action => {
-  const block = document.createElement("div");
-  block.className = "action-block";
-
-  const label = document.createElement("div");
-  label.className = "label";
-  label.textContent = action.label;
-
-  const btn = document.createElement("button");
-  btn.textContent = "上传";
-  btn.onclick = () => selectAndUpload(action.key);
-
-  const status = document.createElement("div");
-  status.className = "status";
-  status.id = `status-${action.key}`;
-
-  const img = document.createElement("img");
-  img.id = `preview-${action.key}`;
-  img.src = ""; // 默认不显示
-
-  const resetBtn = document.createElement("button");
-  resetBtn.textContent = "默认";
-  resetBtn.style.backgroundColor = "#ccc";
-  resetBtn.onclick = async () => {
-    await window.gifAPI.resetImage(action.key);
-    await initPreview(); // 刷新预览
-  };
-  const showdiv = document.createElement("div");
-  showdiv.className = "showdiv";
-
-  block.appendChild(img);
-  block.appendChild(label);
-  block.appendChild(showdiv)
-
-  showdiv.appendChild(btn);
-  showdiv.appendChild(resetBtn);  // ✅ 加在这里
-
-  block.appendChild(status);
-
-
-  uploadArea.appendChild(block);
-});
-
-
-    async function selectAndUpload(action) {
-      const filePath = await window.gifAPI.selectGifFile();
-      const status = document.getElementById("status-" + action);
-      const preview = document.getElementById("preview-" + action);
-
-      if (!filePath) {
-        status.textContent = "已取消选择";
-        preview.src = "";
-        return;
-      }
-
-      try {
-        const res = await fetch("file://" + filePath);
-        const blob = await res.blob();
-
-        const reader = new FileReader();
-        reader.onload = () => {
-          preview.src = reader.result;
-        };
-        reader.readAsDataURL(blob);
-
-        await window.gifAPI.uploadGIF(action, filePath);
-        status.textContent = "上传成功！";
-      } catch (err) {
-        status.textContent = "出错：" + err.message;
-        console.error(err);
-      }
-    }
-
-    window.addEventListener("DOMContentLoaded", () => {
-  initPreview(); // 页面加载后立即尝试加载已存在图片
-});
-
-async function initPreview() {
-  for (const action of actions) {
-    try {
-      const imgPath = await window.gifAPI.getCurrentImage(action.key);
-      const img = document.getElementById("preview-" + action.key);
-      const status = document.getElementById("status-" + action.key);
-
-      if (imgPath && img) {
-        img.src = imgPath;
-        status.innerHTML = `<span style="color:green">已加载上传图</span>`;
-      } else {
-        status.innerHTML = `<span style="color:orange">使用默认</span>`;
-      }
-    } catch (err) {
-      console.error("加载失败：", err);
-    }
-  }
-}
-
-document.getElementById("uploadQuoteJson").addEventListener("click",async ()=>{
-  const result = await window.talkAPI.uploadQuotes();
-  const status = document.getElementById("uploadStatus");
-  if (result.success){
-    status.textContent = "上传成功";
-    status.style.color = "orange";
-  } else {
-    status.textContent = "上传失败";
-    status.style.color = "red";
-  }
-})
-
-document.getElementById("resetQuoteJson").addEventListener("click",async ()=>{
-  const confirmReset = confirm("你确定恢复默认吗？这将删除当前自定义语录");
-  if (!confirmReset) return;
-
-  const result = await window.talkAPI.resetQuotes();
-  const status = document.getElementById("uploadStatus");
-  if (result.success){
-    status.textContent = "已恢复";
-    status.style.color = 'green';
-  } else {
-    status.textContent = "恢复失败";
-    status.style.color = "red";
-  }
-})
-
-async function updateQuoteStatus() {
-  const source = await window.talkAPI.getQuoteSource();
-  const statusEl = document.getElementById("currentQuoteSource");
-
-  if (source === "自定义") {
-    statusEl.textContent = "自定义";
-    statusEl.style.color = "orange";
-  } else if (source === "默认") {
-    statusEl.textContent = "默认";
-    statusEl.style.color = "#28a745";
-  } else {
-    statusEl.textContent = "未知";
-    statusEl.style.color = "red";
-  }
-}
-
-window.addEventListener("DOMContentLoaded", updateQuoteStatus);
-
-
-  </script>
+  <script src="language.js"></script>
+  <script src="quote.js" type="module"></script>
+  <script src="upload.js" type="module"></script>
 </body>
 </html>
 

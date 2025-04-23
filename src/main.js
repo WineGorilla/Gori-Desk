@@ -53,6 +53,7 @@ app.whenReady().then(()=>{
         frame:false,
         transparent: true, // 透明背景
         resizable:false,
+        icon: path.join(__dirname,"./assets/icon/goriicon.ico"),
         backgroundColor: "#00FFFFFF",
         webPreferences:{
             preload:path.join(__dirname,'../preload.js'),
@@ -699,7 +700,7 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
     uploadWindow = new BrowserWindow({
       width: 750,
       height: 350,
-      title: "自定义",
+      title: "Custom",
       icon:path.join(__dirname,"assets","icon","goriicon.ico"),
       webPreferences: {
         preload: path.join(__dirname, '../preload.js'),

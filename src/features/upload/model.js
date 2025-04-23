@@ -1,4 +1,8 @@
 window.addEventListener("DOMContentLoaded",async ()=>{
+    const settings = await window.settingAPI.getSettings?.();
+    const lang = settings.language || "zh";
+    const t  = i18n[lang]
+
     await refereshModelList();
     document.getElementById("setModelBtn").addEventListener("click",async ()=>{
         const select = document.getElementById("modelSelect")

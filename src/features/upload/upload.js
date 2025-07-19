@@ -130,7 +130,7 @@ const i18n = {
     const lang = settings?.language || "zh";
     const t = i18n[lang];
   
-    updateUploadAreaLanguage(t); // 🔁 把原来 actions.forEach 移成函数
+    updateUploadAreaLanguage(t); // 把原来 actions.forEach 移成函数
     initPreview();
   });
   

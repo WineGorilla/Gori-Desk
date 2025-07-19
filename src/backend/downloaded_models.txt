@@ -1,2 +1,1 @@
 qwen:0.5b
-phi

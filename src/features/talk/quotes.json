@@ -1,32 +1,63 @@
 {
   "zh": {
     "default": [
-      "你好呀！今天又是元气满满的一天！",
-      "陪陪我吧，我有点无聊了～",
-      "你在做什么呢？我好想知道！"
+      "今天又是元气满满的一天！",
+      "陪陪我吧，我有点无聊了",
+      "你在做什么呢？我好想知道！",
+      "我刚刚梦见你啦，好神奇！",
+      "天气真好，咱们去晒太阳吧",
+      "要不要听我讲个冷笑话？",
+      "今天有什么好消息吗？分享一下嘛",
+      "嘿嘿，我刚才打了个哈欠。"
     ],
     "lowEnergy": [
       "我好累啊...能给我点吃的吗？",
-      "精力快耗尽了，再不喂我我可要晕倒啦～"
+      "精力快耗尽了，再不喂我我可要晕倒啦",
+      "我感觉整个猩都虚了……",
+      "你是不是忘了我还没吃东西！",
+      "饿得我都快没有力气动了……",
+      "救救猩命，来点香蕉也行！",
+      "再这样下去我就要瘫在地上了～"
     ],
     "highEnergy": [
       "我现在超有劲！快带我玩吧！",
-      "嗨嗨嗨～动起来动起来～"
+      "嗨嗨嗨～动起来动起来",
+      "来啊！跳个舞吧！",
+      "我已经准备好征服整个世界了！",
+      "快给我安排个任务，我闲不住了！",
+      "咱们来玩个小游戏？",
+      "感觉今天可以跑三圈！"
     ]
   },
   "en": {
     "default": [
       "Hi there! It's a brand new day!",
       "Stay with me~ I'm a bit bored.",
-      "What are you doing? I want to know!"
+      "What are you doing? I want to know!",
+      "I just dreamed of you! It was magical!",
+      "The weather's great—let's go sunbathe!",
+      "Wanna hear a lame joke?",
+      "Got any good news today? Share with me!",
+      "I just yawned... maybe you did too?"
     ],
     "lowEnergy": [
       "I'm so tired... Can I have something to eat?",
-      "My energy is low... I'm going to faint if you don't feed me!"
+      "My energy is low... I'm going to faint if you don't feed me!",
+      "I'm totally drained right now...",
+      "Did you forget to feed me again?",
+      "I can barely move… send help!",
+      "Even a banana would save my life now!",
+      "I'm about to collapse if this keeps going!"
     ],
     "highEnergy": [
       "I'm full of energy! Let's play!",
-      "Yooo! Time to move!"
+      "Yooo! Time to move!",
+      "Dance time! Let’s shake it!",
+      "I feel like I can conquer the world!",
+      "Give me something to do, I can't stay still!",
+      "Let’s play a game together!",
+      "I could run three laps today, easy!"
     ]
   }
 }
+

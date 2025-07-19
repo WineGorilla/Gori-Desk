@@ -1,21 +1,84 @@
 {
   "name": "gorilla",
   "version": "1.0.0",
-  "description": "desktop pet, named gorilla",
+  "description": "AI-powered Desktop Assistant",
   "main": "src/main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder"
   },
   "author": "Ruiyu Yan",
   "license": "ISC",
   "devDependencies": {
     "electron": "^35.0.1",
-    "express": "^4.21.2"
+    "electron-builder": "^24.6.0",
+    "express": "^4.21.2",
+    "rcedit": "^4.0.1",
+    "rimraf": "^6.0.1"
   },
   "dependencies": {
-    "llama-cpp": "^1.0.0",
-    "lucide": "^0.501.0",
-    "rwkv-cpp-node": "^2.0.5",
     "sqlite3": "^5.1.7"
+  },
+  "build": {
+    "appId": "com.goridesk.gorilla",
+    "productName": "GoriDesk",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "**/*",
+      "!**/node_modules/*/{test,__tests__,examples}",
+      "!src/backend/app.py",
+      "!src/backend/app.spec"
+    ],
+    "extraResources": [
+      {
+        "from": "src/backend/dist/app.exe",
+        "to": "backend/dist/app.exe"
+      },
+      {
+        "from": "src/backend/ollama",
+        "to": "backend/ollama"
+      },
+      {
+        "from": "src/backend/current_model.txt",
+        "to": "backend/current_model.txt"
+      },
+      {
+        "from": "src/backend/personality.txt",
+        "to": "backend/personality.txt"
+      },
+      {
+        "from": "src/backend/downloaded_models.txt",
+        "to": "backend/downloaded_models.txt"
+      },
+      {
+        "from": "src/todo.db",
+        "to": "src/todo.db"
+      },
+      {
+        "from": "config/setting.json",
+        "to": "config/setting.json"
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "goriicon.ico",
+      "signAndEditExecutable": false
+    },
+    "afterPack":"./afterPack.js",
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "GoriDesk",
+      "installerIcon": "goriicon.ico",
+      "uninstallerIcon": "goriicon.ico"
+    },
+    "forceCodeSigning": false
   }
 }

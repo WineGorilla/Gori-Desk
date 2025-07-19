@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     async function loadPetGifs() {
         const fallback = (local) => `../assets/${local}`;
         gifMap = {
-            idle: await window.petAPI.getCustomGifPath("idle") || fallback("Monkey.png"),
+            idle: await window.petAPI.getCustomGifPath("idle") || fallback("Gorilla.png"),
             comfort: await window.petAPI.getCustomGifPath("comfort") || fallback("comfort.gif"),
             struggle: await window.petAPI.getCustomGifPath("struggle") || fallback("struggle.gif"),
             exhausted: await window.petAPI.getCustomGifPath("exhausted") || fallback("exhausted.gif")

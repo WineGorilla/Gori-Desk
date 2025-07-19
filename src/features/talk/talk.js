@@ -54,7 +54,7 @@ function displayTalk(message) {
 
   setTimeout(() => {
     bubble.style.opacity = 0;
-  }, 4000);
+  }, 5000);
 }
 
 // 定时自动说话逻辑
@@ -68,10 +68,10 @@ function startRandomTalking() {
       const type = energy < 30 ? "lowEnergy" : energy > 70 ? "highEnergy" : "default";
       displayTalk(getRandomQuote(type));
     }
-  }, 1500); 
+  }, 20000); 
 }
 
-// 📌 检查任务并提醒
+// 检查任务并提醒
 function checkTasksAndRemind() {
   window.talkAPI.getPendingTasks().then(tasks => {
     if (tasks.length > 0) {
@@ -114,7 +114,7 @@ function stopLoadingBubble() {
 
   const message = currentLang === "zh" ? "模型加载完成" : "Model loaded";
   bubble.textContent = message;
-
+  
   setTimeout(() => {
     bubble.style.opacity = 0;
   }, 3000);

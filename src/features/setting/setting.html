@@ -204,13 +204,6 @@ nav {
 
       <div class="setting-group">
         <div class="switch">
-          <label for="autoLaunch" id="autoLaunchLabel">开机自启:</label>
-          <input type="checkbox" id="autoLaunch">
-        </div>
-      </div>
-
-      <div class="setting-group">
-        <div class="switch">
           <label for="enableChat" id="chatLabel">启用对话:</label>
           <input type="checkbox" id="enableChat">
         </div>
@@ -229,7 +222,6 @@ const i18n = {
     title: "基础设置",
     selectLanguage: "选择语言",
     transparencyLabel: "透明度",
-    autoLaunch: "开机自启:",
     enableChat: "启用对话:",
     save: "保存设置",
     navInfo:'资料',
@@ -240,7 +232,6 @@ const i18n = {
     title: "Settings",
     selectLanguage: "Choose Language:",
     transparencyLabel: "Transparency:",
-    autoLaunch: "Auto Launch:",
     enableChat: "Enable Chat:",
     save: "Save Settings",
     navInfo: "Info",
@@ -257,7 +248,6 @@ function updateLanguage(lang) {
   document.getElementById("titleText").textContent = t.title;
   document.getElementById("langLabel").textContent = t.selectLanguage;
   document.getElementById("transLabel").textContent = t.transparencyLabel;
-  document.getElementById("autoLaunchLabel").textContent = t.autoLaunch;
   document.getElementById("chatLabel").textContent = t.enableChat;
   document.getElementById("saveBtn").textContent = t.save;
   document.getElementById("navInfoBtn").textContent = t.navInfo;
@@ -268,18 +258,17 @@ function updateLanguage(lang) {
 // 📦 初始化设置
 async function initSettings() {
   try {
-    console.log("🛠️ 正在尝试读取设置...");
-    if (!window.settingAPI) throw new Error("❌ settingAPI 不存在");
+    console.log("正在尝试读取设置...");
+    if (!window.settingAPI) throw new Error("settingAPI 不存在");
 
     const settings = await window.settingAPI.getSettings();
-    console.log("✅ 设置读取成功:", settings);
+    console.log("设置读取成功:", settings);
 
-    if (!settings || typeof settings !== "object") throw new Error("❌ 设置返回无效");
+    if (!settings || typeof settings !== "object") throw new Error("设置返回无效");
 
     // 初始化表单控件
     document.getElementById("languageSelect").value = settings.language;
     document.getElementById("transparencyRange").value = settings.transparency;
-    document.getElementById("autoLaunch").checked = settings.autoLaunch;
     document.getElementById("enableChat").checked = settings.enableChat;
 
     // 应用语言
@@ -289,19 +278,18 @@ async function initSettings() {
     document.getElementById("loading").style.display = "none";
     document.getElementById("mainUI").style.display = "block";
   } catch (err) {
-    console.error("❌ 设置加载失败:", err);
+    console.error("设置加载失败:", err);
     document.getElementById("loading").innerHTML =
-      '<span style="color:#e74c3c;font-size:20px">❌ 设置加载失败，请重启应用</span>';
+      '<span style="color:#e74c3c;font-size:20px">设置加载失败，请重启应用</span>';
   }
 }
 
-// 💾 保存设置
+// 保存设置
 function bindSaveButton() {
   document.getElementById("saveBtn").addEventListener("click", () => {
     const settings = {
       language: document.getElementById("languageSelect").value,
       transparency: parseInt(document.getElementById("transparencyRange").value),
-      autoLaunch: document.getElementById("autoLaunch").checked,
       enableChat: document.getElementById("enableChat").checked
     };
 
@@ -312,7 +300,7 @@ function bindSaveButton() {
   });
 }
 
-// 🌐 语言切换同步主窗口
+// 语言切换同步主窗口
 function bindLanguageChange() {
   document.getElementById("languageSelect").addEventListener("change", () => {
     const lang = document.getElementById("languageSelect").value;
@@ -329,7 +317,7 @@ function bindLanguageChange() {
   });
 }
 
-// 🌫️ 实时透明度调整
+// 实时透明度调整
 function bindTransparencyChange() {
   document.getElementById("transparencyRange").addEventListener("input", (e) => {
     const value = parseInt(e.target.value);
@@ -340,11 +328,11 @@ function bindTransparencyChange() {
 function bindTalkChange(){
   document.getElementById("enableChat").addEventListener("change", (e) => {
   const value = e.target.checked;
-  window.settingAPI.changeTalk(value); // ✅ 通知主进程，让其广播给其他窗口
+  window.settingAPI.changeTalk(value); // 通知主进程，让其广播给其他窗口
 });
 }
 
-// 🚀 页面加载后初始化
+// 页面加载后初始化
 window.addEventListener("DOMContentLoaded", () => {
   initSettings();
   bindSaveButton();

@@ -5,12 +5,14 @@ app = Flask(__name__)
 
 def start_ollama():
     base = os.path.dirname(__file__)
-    exe = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ollama", "ollama.exe"))
-
-    model_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ollama", "models"))
+    exe = os.path.abspath(os.path.join(os.path.dirname(__file__), "ollama", "ollama.exe"))
+    model_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "ollama", "models"))
 
     env = os.environ.copy()
+    env["OLLAMA_MODELS"] = model_path 
+
     subprocess.Popen([exe, "serve"], cwd=os.path.dirname(exe), env=env)
+
 
 start_ollama()
 time.sleep(1)

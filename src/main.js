@@ -2,13 +2,12 @@ const {app, BrowserWindow,ipcMain,dialog} = require("electron")
 const path = require("path");
 const sqlite3 = require("sqlite3").verbose();
 const fs = require("fs");
-const RWKV = require("rwkv-cpp-node");
 const {spawn} = require("child_process");
-const { languages } = require("prismjs");
 const { error } = require("console");
-const { name } = require("ejs");
 const http = require("http");
 const os = require("os");
+const { config } = require("process");
+
 
 let quotesData = {}
 let quoteSourceLabel = "default";
@@ -24,14 +23,37 @@ let childWindowOffsets = {}; //存储子窗口的自定义偏移量
 let isDragging = false;
 let dragTimeout;
 let rwkvInstance = null;
-const notePath = path.join(__dirname,"note.txt");
-const configDir = path.join(__dirname, '../config');
+const notePath = path.join(app.getPath("userData"), "note.txt");
+const configDir = path.join(app.getPath('userData'), 'config');
+
 const settingsPath = path.join(configDir, 'settings.json');
 
-const db = new sqlite3.Database(path.join(__dirname,"todo.db"),(err)=>{
-    if (err) console.error("Connect error")
-    else console.log("Connect successful")
-})
+
+const defaultSettingsPath = path.join(process.resourcesPath, "config", "settings.json"); //process.resourcePath打包后安装包所在的路径
+if (!fs.existsSync(configDir)){
+  fs.mkdirSync(config,{recursive:true}); //recursive表示父目录如果不存在则一起创建
+}
+if (!fs.existsSync(settingsPath)) {
+  fs.copyFileSync(defaultSettingsPath, settingsPath);
+}
+
+
+
+
+
+//数据库文件配置
+const userDataPath = app.getPath("userData")
+const dbPath = path.join(userDataPath,'todo.db')
+const defaultDbPath = path.join(process.resourcesPath,'src','todo.db')
+
+if (!fs.existsSync(dbPath)) {
+  fs.copyFileSync(defaultDbPath, dbPath);
+}
+
+const db = new sqlite3.Database(dbPath, (err) => {  //打开对应db文件
+  if (err) console.error("Connect error", err);
+  else console.log("Connect successful");
+});
 
 db.run(`CREATE TABLE IF NOT EXISTS profile (
     id INTEGER PRIMARY KEY,
@@ -45,6 +67,7 @@ db.run(`CREATE TABLE IF NOT EXISTS profile (
 
 db.run("CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, text TEXT, completed BOOLEAN)")
 
+//主窗口加载
 app.whenReady().then(()=>{
     mainwindow = new BrowserWindow({
         width:300,
@@ -53,29 +76,32 @@ app.whenReady().then(()=>{
         frame:false,
         transparent: true, // 透明背景
         resizable:false,
-        icon: path.join(__dirname,"./assets/icon/goriicon.ico"),
+        icon: path.join(__dirname,"../goriicon.ico"),
         backgroundColor: "#00FFFFFF",
         webPreferences:{
-            preload:path.join(__dirname,'../preload.js'),
+            preload:path.join(__dirname,'../preload.js'), //预加载脚本
             nodeIntegration:false,
-            contextIsolation:true
+            contextIsolation:true //开启上下文隔离
         }
     })
 
     mainwindow.loadFile(path.join(__dirname, "./renderer/index.html"));
+
     watchWindowDrag(mainwindow);
     mainwindow.on("move",()=>{
         updateChildWindowsPosition()
     })
     mainwindow.on('closed',()=>{
-        mainwindow = null;
+        mainwindow = null; //关闭的时候进行清理
     })
 
-    loadQuotes();
+    loadQuotes(); //获取语句数据
 
 })
 
-function isValidQuotes(json) {
+
+//语句模块
+function isValidQuotes(json) { //判断json文件是否有效
   return (
     json && typeof json === "object" &&
     Object.keys(json).length > 0 &&
@@ -87,7 +113,7 @@ function isValidQuotes(json) {
 
 function loadQuotes() {
   const defaultPath = path.join(__dirname, "features", "talk", "quotes.json");
-  const customPath = path.join(__dirname, "../config/quotes.json");
+  const customPath = path.join(app.getPath("userData"), "config", "quotes.json");
 
   try {
     let targetPath = defaultPath;
@@ -95,13 +121,12 @@ function loadQuotes() {
 
     if (fs.existsSync(customPath)) {
       jsonRaw = fs.readFileSync(customPath, "utf-8");
-      const parsed = JSON.parse(jsonRaw);
+      const parsed = JSON.parse(jsonRaw); //解析json文件
       if (isValidQuotes(parsed)) {
         quotesData = parsed;
         quoteSourceLabel = "自定义";
         targetPath = customPath;
       } else {
-        console.warn("⚠️ 自定义 quotes.json 内容无效，使用默认");
         jsonRaw = fs.readFileSync(defaultPath, "utf-8");
         quotesData = JSON.parse(jsonRaw);
         quoteSourceLabel = "默认";
@@ -114,18 +139,20 @@ function loadQuotes() {
       targetPath = defaultPath;
     }
 
-    console.log("✅ 使用语录文件：", path.basename(targetPath));
+    console.log("使用语录文件：", path.basename(targetPath));
   } catch (err) {
-    console.error("❌ 无法加载语录文件：", err);
+    console.error("无法加载语录文件：", err);
     quotesData = {};
     quoteSourceLabel = "未知";
   }
 }
 
+//判断窗口是否都关闭
 app.on("window-all-closed",()=>{
     if (process.platform !== 'darwin') app.quit();
 })
 
+//创建子窗口
 async function createChildWindow(name, file, width, height, offsetX, offsetY) {
     for (const key in childWindows) {
         if (childWindows[key] && key !== name) {
@@ -172,7 +199,7 @@ async function createChildWindow(name, file, width, height, offsetX, offsetY) {
         mainwindow.webContents.send("chat-loading");
         startFlask();
 
-        // 🔁 Automatically wait for Flask and Ollama to be ready
+        // Automatically wait for Flask and Ollama to be ready
         async function waitForFlaskReady(retries = 10, delay = 500) {
           for (let i = 0; i < retries; i++) {
             try {
@@ -195,7 +222,7 @@ async function createChildWindow(name, file, width, height, offsetX, offsetY) {
         try {
           const result = await waitForFlaskReady();
           mainwindow.webContents.send("chat-loaded")
-          console.log("✅ Model is ready. Opening chat window...");
+          console.log("Model is ready. Opening chat window...");
         } catch (err) {
           console.error(err.message);
           return;
@@ -207,7 +234,7 @@ async function createChildWindow(name, file, width, height, offsetX, offsetY) {
     
     
 
-// 👇 失去焦点后关闭，但排除切换到主窗口的情况
+// 失去焦点后关闭，但排除切换到主窗口的情况
     if (name !== "chat") {
     childWindows[name].on("blur", () => {
     setTimeout(() => {
@@ -227,7 +254,7 @@ async function createChildWindow(name, file, width, height, offsetX, offsetY) {
 
         if (name === "chat") {
             if (flaskProcess && !flaskProcess.killed) {
-              console.log("🛑 Terminating Flask backend...");
+              console.log("Terminating Flask backend...");
               flaskProcess.kill();
               flaskProcess = null;
             }
@@ -266,6 +293,8 @@ ipcMain.on("open-note",()=>{
     createChildWindow("note","features/note/note.html",400,500,230,0);
 })
 
+
+//note模块
 // 获取所有任务
 ipcMain.handle("getTasks", (event) => {
     console.log("Loading data");
@@ -354,7 +383,7 @@ ipcMain.handle("saveNote", (event, content) => {
 
 ipcMain.handle("exportTxt", async (event, content) => {
     const { filePath } = await dialog.showSaveDialog({
-        title: "保存为 TXT",
+        title: "TXT",
         defaultPath: "note.txt",
         filters: [{ name: "Text Files", extensions: ["txt"] }]
     });
@@ -369,7 +398,7 @@ ipcMain.handle("exportTxt", async (event, content) => {
 ipcMain.handle("exportPdf", async (event) => {
     const win = BrowserWindow.fromWebContents(event.sender);
     const { filePath } = await dialog.showSaveDialog({
-        title: "导出为 PDF",
+        title: "PDF",
         defaultPath: "note.pdf",
         filters: [{ name: "PDF Files", extensions: ["pdf"] }]
     });
@@ -403,7 +432,7 @@ ipcMain.on("exit-app",()=>{
 
 ipcMain.on("open-info", () => {
     infoWindow = new BrowserWindow({
-        width: 750,
+        width: 800,
         height: 350,
         title: "Info",
         alwaysOnTop: true,
@@ -412,7 +441,7 @@ ipcMain.on("open-info", () => {
         backgroundColor: "#00000000", // 确保透明背景
         resizable: true, // 可调整大小
         minimizable: false, // 不允许最小化
-        icon:path.join(__dirname,"assets","icon","goriicon.ico"),
+        icon:path.join(__dirname,"assets","icon","goriicon.png"),
         webPreferences: {
             preload: path.join(__dirname, "../preload.js"),
             contextIsolation: true
@@ -467,9 +496,9 @@ ipcMain.handle("checkBirthday", () => {
         const petBirthday = row?.pet_birthday?.slice(5, 10);
 
         let message = null;
-        if (ownerBirthday === today && ownerBirthday !== petBirthday) message = "🎉 祝主人生日快乐！";
-        else if (petBirthday === today && petBirthday !== ownerBirthday) message = "🎂 今天是我的生日喔～";
-        else if (petBirthday === ownerBirthday && petBirthday === today) message = "主人，今天我们都过生日！缘，妙不可言！"
+        if (ownerBirthday === today && ownerBirthday !== petBirthday) message = "Happy Birthday!!!";
+        else if (petBirthday === today && petBirthday !== ownerBirthday) message = "今天是我的生日哦！";
+        else if (petBirthday === ownerBirthday && petBirthday === today) message = "Happy Birthday!!!缘，妙不可言！"
 
         resolve(message); // 若非生日则为 null
       }
@@ -486,7 +515,7 @@ ipcMain.handle("getPendingTasks", (event) => {
     });
 });
 
-function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-drag-end", delay = 800) {
+function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-drag-end", delay = 300) {
     let isDragging = false;
     let dragTimeout;
   
@@ -511,7 +540,7 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
   }
 
 
-  function waitForFlaskReady(url = "http://localhost:5000/chat", retries = 10, delay = 500) {
+  function waitForFlaskReady(url = "http://localhost:5000/chat", retries = 20, delay = 500) {
     return new Promise((resolve, reject) => {
       const tryConnect = async () => {
         try {
@@ -523,7 +552,7 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
           const data = await res.json();
           resolve(data.reply);
         } catch (err) {
-          if (retries <= 0) return reject("❌ Flask 未启动或 Ollama 无响应");
+          if (retries <= 0) return reject("Flask 未启动或 Ollama 无响应");
           setTimeout(() => {
             retries--;
             tryConnect();
@@ -546,7 +575,7 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
       const data = await res.json();
       return data.reply;
     } catch (err) {
-      return `❌ 无法连接本地 AI：${err}`;
+      return `无法连接本地 AI：${err}`;
     }
   });
   
@@ -554,19 +583,21 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
   function startFlask() {
     if (flaskProcess) return;
   
-    flaskProcess = spawn("python", ["backend/app.py"], {
-      cwd: __dirname,
-      detached: process.platform !== "win32", // 🟢 仅非 Windows 启用 detached
+    const flaskExecutable = app.isPackaged
+      ? path.join(process.resourcesPath, "backend", "dist", "app.exe")
+      : path.join(__dirname, "backend", "dist", "app.exe");
+  
+    flaskProcess = spawn(flaskExecutable, [], {
+      cwd: path.dirname(flaskExecutable),
+      detached: true,
       stdio: "ignore",
       windowsHide: true
     });
   
-    if (process.platform !== "win32") {
-      flaskProcess.unref();
-    }
-  
-    console.log("🚀 Flask started with PID:", flaskProcess.pid);
+    flaskProcess.unref();
+    console.log("Flask app.exe started with PID:", flaskProcess.pid);
   }
+  
   
   // 停止 Flask
   function stopFlask() {
@@ -580,15 +611,15 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
           process.kill(-flaskProcess.pid);
         }
   
-        console.log("🛑 Flask backend stopped.");
+        console.log("Flask backend stopped.");
       } catch (err) {
-        console.error("❌ 无法终止 Flask:", err);
+        console.error("无法终止 Flask:", err);
       }
       flaskProcess = null;
     }
   }
   
-  // ⬅️ 监听关闭指令（来自渲染进程）
+  // ⬅监听关闭指令（来自渲染进程）
   ipcMain.on("chat-window-close", () => {
     stopFlask(); // 停止 Flask
   
@@ -640,14 +671,14 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
     }
   
     settingWindow = new BrowserWindow({
-      width: 750,
+      width: 800,
       height: 350,
       title: "Settings",
       alwaysOnTop: true,
       transparent: true,
       parent: mainwindow,
       backgroundColor: "#00000000",
-      icon:path.join(__dirname,"assets","icon","goriicon.ico"),
+      icon:path.join(__dirname,"assets","icon","goriicon.png"),
       resizable: true,
       minimizable: false,
       webPreferences: {
@@ -685,7 +716,7 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
   });
 
 
-  const userDir = path.join(__dirname,"../user");
+  const userDir = path.join(app.getPath("userData"), "user");
   let uploadWindow = null;
 
   ipcMain.on("open-upload-window", async () => {
@@ -698,14 +729,14 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
     startOllama()
 
     uploadWindow = new BrowserWindow({
-      width: 750,
+      width: 800,
       height: 350,
       title: "Custom",
-      icon:path.join(__dirname,"assets","icon","goriicon.ico"),
+      icon:path.join(__dirname,"assets","icon","goriicon.png"),
       webPreferences: {
         preload: path.join(__dirname, '../preload.js'),
         contextIsolation: true,
-        nodeIntegration: false, // ✅ 禁用以确保安全
+        nodeIntegration: false, // 禁用以确保安全
         enableRemoteModule: false
       }
     });
@@ -725,13 +756,13 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
 
 
   ipcMain.handle("select-gif", async () => {
-    console.log("⚡️ 正在打开文件选择窗口");
+    console.log("正在打开文件选择窗口");
     const result = await dialog.showOpenDialog({
       title: "选择一个 GIF 文件",
       filters: [{ name: "Images", extensions: ["gif", "png","jpg"] }],
       properties: ["openFile"]
     });
-    console.log("📂 选择结果：", result);
+    console.log("选择结果：", result);
   
     if (!result.canceled && result.filePaths.length > 0) {
       return result.filePaths[0];
@@ -752,19 +783,19 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
       fs.unlinkSync(path.join(targetDir, file));
     });
   
-    // ✅ 获取真实扩展名
+    // 获取真实扩展名
     const ext = path.extname(filePath); // 例如 .gif 或 .png
     const destPath = path.join(targetDir, "pet" + ext);
   
     fs.copyFileSync(filePath, destPath);
-    console.log(`✅ ${action} 文件已替换: ${destPath}`);
+    console.log(`${action} 文件已替换: ${destPath}`);
   });
 
   ipcMain.handle("get-pet-image", (_event, action) => {
-    const gifPath = path.join(__dirname, "./user", action, "pet.gif");
-    const pngPath = path.join(__dirname, "./user", action, "pet.png");
-    const jpgPath = path.join(__dirname, "./user", action, "pet.jpg"); // ✅ 你已声明
-    const fallback = path.join(__dirname, "./assets", "Monkey.png");
+    const gifPath = path.join(userDir, action, "pet.gif");
+    const pngPath = path.join(userDir, action, "pet.png");
+    const jpgPath = path.join(userDir, action, "pet.jpg"); // ✅ 你已声明
+    const fallback = path.join(userDir, action, "Gorilla.png");
   
     if (fs.existsSync(gifPath)) return "file://" + gifPath.replace(/\\/g, "/");
     if (fs.existsSync(pngPath)) return "file://" + pngPath.replace(/\\/g, "/");
@@ -775,12 +806,12 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
   
 
   ipcMain.handle("get-custom-gif-path", (_event, action = "idle") => {
-    const dirPath = path.join(app.getAppPath(), "user", action);
+    const dirPath = path.join(userDir, action)
   
     if (!fs.existsSync(dirPath)) return null;
   
     const files = fs.readdirSync(dirPath);
-    const image = files.find(f => /\.(gif|png|jpg)$/i.test(f)); // ✅ 支持 gif/png/jpg
+    const image = files.find(f => /\.(gif|png|jpg)$/i.test(f)); // 支持 gif/png/jpg
     if (image) {
       return "file://" + path.join(dirPath, image).replace(/\\/g, "/");
     }
@@ -790,7 +821,7 @@ function watchWindowDrag(win, startEvent = "pet-drag-start", endEvent = "pet-dra
   
 
 const defaultMap = {
-  idle: "Monkey.png",
+  idle: "Gorilla.png",
   struggle: "struggle.gif",
   eatA: "banana.gif",
   eatB: "cola.gif",
@@ -800,7 +831,7 @@ const defaultMap = {
 };
 
 ipcMain.handle("get-current-image", (event, action) => {
-  const userPath = path.join(__dirname, "../user", action);
+  const userPath = path.join(userDir, action)
   const gif = path.join(userPath, "pet.gif");
   const png = path.join(userPath, "pet.png");
   const jpg = path.join(userPath, "pet.jpg");
@@ -815,12 +846,12 @@ ipcMain.handle("get-current-image", (event, action) => {
 });
 
 ipcMain.on("reset-gif", (event, action) => {
-  const targetDir = path.join(__dirname, "../user", action);
+  const targetDir = path.join(userDir, action);
   if (fs.existsSync(targetDir)) {
     fs.readdirSync(targetDir).forEach(file => {
       fs.unlinkSync(path.join(targetDir, file));
     });
-    console.log(`🔁 ${action} 已重置为默认`);
+    console.log(`${action} 已重置为默认`);
   }
 });
 
@@ -841,7 +872,7 @@ ipcMain.on("open-menu", () => {
 
   menuWindow.loadFile(path.join(__dirname, 'features/menu/menu.html'));
 
-  // ✅ 关闭事件监听放在创建之后
+  // 关闭事件监听放在创建之后
   menuWindow.on("closed", () => {
     menuWindow = null;
   });
@@ -867,7 +898,7 @@ ipcMain.handle("upload-custom-quotes",async ()=>{
       return {success:false,message:"用户取消"}
     }
     const sourcePath = filePaths[0];
-    const destPath = path.join(__dirname,"../config/quotes.json")
+    const destPath = path.join(app.getPath("userData"), "config", "quotes.json")
 
     const content = fs.readFileSync(sourcePath,'utf-8');
     const parsed = JSON.parse(content);
@@ -884,10 +915,10 @@ ipcMain.handle("upload-custom-quotes",async ()=>{
 });
 
 ipcMain.handle("reset-custom-quotes", () => {
-  const customPath = path.join(__dirname, "../config/quotes.json");
+  const customPath = path.join(app.getPath("userData"), "config", "quotes.json");
   try {
     if (fs.existsSync(customPath)) {
-      fs.unlinkSync(customPath); // ✅ 删除自定义语录
+      fs.unlinkSync(customPath); // 删除自定义语录
       console.log("Has been delete");
       return { success: true };
     } else {
@@ -900,7 +931,7 @@ ipcMain.handle("reset-custom-quotes", () => {
 
 
 ipcMain.on("save-personality",(event,content)=>{
-  const personalityPath = path.join(__dirname,"backend","personality.txt")
+  const personalityPath = path.join(app.getPath("userData"), "config", "personality.txt");
   try {
     fs.writeFileSync(personalityPath,content.trim(),'utf-8');
     console.log("personality has been updated")
@@ -910,7 +941,7 @@ ipcMain.on("save-personality",(event,content)=>{
 })
 
 ipcMain.handle("get-personality",async ()=>{
-  const filepath = path.join(__dirname,"backend","personality.txt")
+  const filepath = path.join(app.getPath("userData"),"config","personality.txt")
   try {
     return fs.readFileSync(filepath,'utf-8')
   } catch(err){
@@ -918,12 +949,15 @@ ipcMain.handle("get-personality",async ()=>{
   }
 })
 
+const baseBackendPath = app.isPackaged
+  ? path.join(process.resourcesPath, "backend")
+  : path.join(__dirname, "backend");
 
-const modelDir = path.join(os.homedir(), ".ollama", "models", "manifests", "registry.ollama.ai", "library");
-const modelRoot = path.join(__dirname, "ollama", "models");
-const modelListFile = path.join(__dirname, "backend", "downloaded_models.txt");
-const currentModelPath = path.join(__dirname, 'backend', 'current_model.txt');
-let currentModel = "phi"
+const modelDir = path.join(baseBackendPath, "ollama", "models");
+const modelRoot = modelDir;
+const modelListFile = path.join(baseBackendPath, "downloaded_models.txt");
+const currentModelPath = path.join(baseBackendPath, "current_model.txt");
+let currentModel = "Owen:0.5b";
 
 ipcMain.handle("get-available-models", async () => {
   if (!fs.existsSync(modelListFile)) return [];
@@ -933,35 +967,31 @@ ipcMain.handle("get-available-models", async () => {
     .map(l => l.trim())
     .filter(Boolean);
 
-  return Array.from(new Set(lines)); // 去重后返回
+  return Array.from(new Set(lines));
 });
 
 ipcMain.handle("get-current-model", () => {
   if (fs.existsSync(currentModelPath)) {
-    return fs.readFileSync(currentModelPath, "utf-8").trim(); 
+    return fs.readFileSync(currentModelPath, "utf-8").trim();
   } else {
-    return "qwen:0.5b"; // 👈 默认模型名称
+    return "qwen:0.5b";
   }
 });
 
-ipcMain.on("set-current-model",(_e, name) => {
+ipcMain.on("set-current-model", (_e, name) => {
   currentModel = name;
   console.log("The model has been changed:", name);
-
-  const filePath = path.join(__dirname, "backend", "current_model.txt");
-  fs.writeFileSync(filePath, name, "utf-8");
+  fs.writeFileSync(currentModelPath, name, "utf-8");
 });
 
 let ollamaProcess = null;
 
-// 启动 ollama serve 时必须设置 OLLAMA_MODELS！
 function startOllama() {
-  const ollamaExe = path.join(__dirname, "./ollama/ollama.exe");
-  const modelDir = path.join(__dirname, "ollama", "models");
+  const ollamaExe = path.join(baseBackendPath, "ollama", "ollama.exe");
 
   const env = {
     ...process.env,
-    OLLAMA_MODELS: modelDir // ✅ 关键！必须在 serve 阶段设置
+    OLLAMA_MODELS: modelDir
   };
 
   ollamaProcess = spawn(ollamaExe, ["serve"], {
@@ -976,19 +1006,17 @@ function startOllama() {
   console.log("🚀 Ollama started, PID:", ollamaProcess.pid);
 }
 
-
 function stopOllama() {
   if (ollamaProcess && ollamaProcess.pid) {
     try {
-      // 判断该 PID 是否仍然存在
-      process.kill(ollamaProcess.pid, 0); // 这一步不会杀死，只是检查
-      process.kill(ollamaProcess.pid);    // 真正 kill
+      process.kill(ollamaProcess.pid, 0);
+      process.kill(ollamaProcess.pid);
       console.log("Exit Ollama");
     } catch (err) {
       if (err.code === "ESRCH") {
-        console.warn("ollama has been exited");
+        console.warn("Ollama has been exited");
       } else {
-        console.error("Cannot exit ollama:", err);
+        console.error("Cannot exit Ollama:", err);
       }
     } finally {
       ollamaProcess = null;
@@ -996,12 +1024,8 @@ function stopOllama() {
   }
 }
 
-
-
-
-// 使用 HTTP API 拉取模型
 ipcMain.handle("download-model", async (_e, modelName) => {
-  const modelExe = path.join(__dirname, "ollama", "ollama.exe");
+  const modelExe = path.join(baseBackendPath, "ollama", "ollama.exe");
 
   if (!fs.existsSync(modelExe)) {
     throw new Error("ollama.exe is not existed");
@@ -1014,7 +1038,7 @@ ipcMain.handle("download-model", async (_e, modelName) => {
   return new Promise((resolve, reject) => {
     const env = {
       ...process.env,
-      OLLAMA_MODELS: modelRoot // ✅ 下载路径设定
+      OLLAMA_MODELS: modelRoot
     };
 
     const cmd = spawn(modelExe, ["pull", modelName], {
@@ -1031,7 +1055,7 @@ ipcMain.handle("download-model", async (_e, modelName) => {
         currentModel = modelName;
         const modelPath = path.join(modelRoot, "manifests", "registry.ollama.ai", "library", modelName.split(":")[0]);
         console.log(`✅ 模型 ${modelName} 下载成功，存储路径为：\n${modelPath}`);
-        saveDownloadedModel(modelName)
+        saveDownloadedModel(modelName);
         resolve();
       } else {
         reject(new Error("Cannot download the model"));

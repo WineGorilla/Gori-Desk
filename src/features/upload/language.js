@@ -29,7 +29,7 @@ const i18n = {
       quoteResetFail: "恢复失败",
       quoteResetConfirm: "你确定恢复默认吗？这将删除当前自定义语录",
   
-      avatarTitle: "自定义形象 GIF / PNG",
+      avatarTitle: "自定义形象 GIF/PNG/JPG",
       upload: "上传",
       reset: "默认",
       statusLoaded: "已加载上传图",
@@ -72,7 +72,7 @@ const i18n = {
       quoteResetFail: "Reset failed",
       quoteResetConfirm: "Are you sure to reset to default? It will delete your custom quote file.",
   
-      avatarTitle: "Custom GIF / PNG Avatars",
+      avatarTitle: "Custom GIF/PNG/JPG Avatars",
       upload: "Upload",
       reset: "Reset",
       statusLoaded: "Custom image loaded",
@@ -114,7 +114,6 @@ const i18n = {
     // gif上传标题
     document.querySelectorAll("h2")[2].textContent = t.avatarTitle;
   
-    // 上传区按钮、状态文字动态替换可参考 actions.forEach 内的逻辑，用 `t.upload` `t.reset` `t.statusLoaded` 等替换
   }
 
   window.settingAPI.onLanguageChange((lang)=>{

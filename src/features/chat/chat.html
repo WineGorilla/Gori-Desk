@@ -185,6 +185,16 @@
   background: #ececf1;
   color: #333;
 }
+.title-box{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.icon{
+  object-fit: cover;
+  width: 24px;
+  height: 24px;
+}
 
 
   </style>
@@ -192,7 +202,10 @@
 <body>
   <div class="container">
     <div class="header-row">
-      <h4>GoriDesk</h4>
+      <div class="title-box">
+        <img class="icon" src="../../assets/icon/goriicon.png">
+        <h4>GoriDesk</h4>
+      </div>
       <div class="close-btn" onclick="closeChat()" title="关闭">x</div>
     </div>    
     <hr>

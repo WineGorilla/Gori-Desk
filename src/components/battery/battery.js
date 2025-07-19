@@ -2,7 +2,7 @@ const MAX_ENERGY = 100;
 const MIN_ENERGY = 10;
 const EXHAUSTED_THRESHOLD = 20;
 const ANIMATION_DURATION = 2500;
-const ENERGY_DECAY_INTERVAL = 10000;
+const ENERGY_DECAY_INTERVAL = 120000;
 
 let petEnergy = MAX_ENERGY;
 let isExhaustedPlaying = false;
@@ -21,7 +21,7 @@ async function loadPetGifs() {
     banana: await window.petAPI.getCustomGifPath("eatA") || fallback("banana.gif"),
     cola: await window.petAPI.getCustomGifPath("eatB") || fallback("cola.gif"),
     yogurt: await window.petAPI.getCustomGifPath("eatC") || fallback("yogurt.gif"),
-    normal: await window.petAPI.getCustomGifPath("idle") || fallback("Monkey.png"),
+    normal: await window.petAPI.getCustomGifPath("idle") || fallback("Gorilla.png"),
     exhausted: await window.petAPI.getCustomGifPath("struggle") || fallback("exhausted.gif")
   };
 }
@@ -50,7 +50,7 @@ function increaseEnergy(amount, foodType = "banana") {
 }
 
 function decreaseEnergy() {
-  petEnergy = Math.max(MIN_ENERGY, petEnergy - 10);
+  petEnergy = Math.max(MIN_ENERGY, petEnergy - 5);
   updateEnergyUI();
 }
 

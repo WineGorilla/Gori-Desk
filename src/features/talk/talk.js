@@ -84,7 +84,7 @@ function checkTasksAndRemind() {
   });
 }
 
-// 🌐 监听语言切换（设置页面通知主窗口）
+// 监听语言切换（设置页面通知主窗口）
 window.settingAPI.onLanguageChange((lang) => {
   currentLang = lang;
   console.log("语录语言已切换为:", lang);

@@ -76,6 +76,7 @@ app.whenReady().then(()=>{
         frame:false,
         transparent: true, // 透明背景
         resizable:false,
+        hasShadow: false,
         icon: path.join(__dirname,"../goriicon.ico"),
         backgroundColor: "#00FFFFFF",
         webPreferences:{

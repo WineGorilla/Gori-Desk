@@ -23,7 +23,7 @@ const i18n = {
     }
   };
   
-  // 🌐 应用语言更新函数
+  // 应用语言更新函数
   function updateLanguage(lang) {
     const t = i18n[lang] || i18n.zh;
   
@@ -39,7 +39,7 @@ const i18n = {
     document.getElementById("menu-upload").textContent = t.menu_upload;
   }
   
-  // ✅ 页面初始化加载语言
+  // 页面初始化加载语言
   window.addEventListener("DOMContentLoaded", async () => {
     try {
       const settings = await window.settingAPI.getSettings();
@@ -52,7 +52,7 @@ const i18n = {
     }
   });
   
-  // ✅ 主动监听来自设置页面的语言切换通知
+  // 主动监听来自设置页面的语言切换通知
   window.settingAPI.onLanguageChange((lang) => {
     updateLanguage(lang);
     console.log("主窗口语言已切换为:", lang);

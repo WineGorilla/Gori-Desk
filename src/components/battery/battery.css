@@ -1,9 +1,9 @@
 /* 让电池放在 img 右下角 */
 .pet-energy-container {
     position: absolute;
-    bottom: 38px;  /* 靠近底部 */
-    right: 32px;  /* 靠近右侧 */
-    width: 16px; /* 控制电池大小 */
+    bottom: 38px;  
+    right: 32px; 
+    width: 16px; 
     text-align: center;
     font-size: 8px;
     color: black;
